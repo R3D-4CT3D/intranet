@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSUN Art & Design Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .csun-red { background-color: #CE1126; }
+        .csun-red-text { color: #CE1126; }
+        .csun-red-border { border-color: #CE1126; }
+        
+        .action-button {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(206, 17, 38, 0.2);
+            border-color: #CE1126;
+        }
+        
+        .news-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .news-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+        
+        .chat-bubble {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1000;
+        }
+        
+        .chat-window {
+            position: fixed;
+            bottom: 100px;
+            right: 24px;
+            width: 380px;
+            height: 500px;
+            z-index: 999;
+            display: none;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .chat-window.active {
+            display: block;
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #CE1126 0%, #a00e1f 100%);
+        }
+
+        /* Calendar Styles */
+        .calendar-day {
+            transition: all 0.2s ease;
+        }
+        
+        .calendar-day:hover {
+            background-color: #f3f4f6;
+        }
+        
+        .calendar-day.has-event {
+            background-color: #fef3f2;
+            border-left: 3px solid #CE1126;
+        }
+        
+        .calendar-day.has-event:hover {
+            background-color: #fee2e2;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="csun-red text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold">CSUN Art & Design Portal</h1>
+                    <p class="text-sm opacity-90 mt-1">Department Technology Services</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm opacity-90">Welcome, Faculty & Staff</div>
+                    <div class="text-xs opacity-75 mt-1" id="currentDate"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-6 py-8">
+        <!-- Stats Bar -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="stat-card rounded-lg shadow-lg p-6 text-white text-center">
+                <div class="text-sm opacity-90 uppercase mb-2">Total Enrollments</div>
+                <div class="text-4xl font-bold" id="totalEnrollments">1,647</div>
+            </div>
+            <div class="stat-card rounded-lg shadow-lg p-6 text-white text-center">
+                <div class="text-sm opacity-90 uppercase mb-2">Undergraduate</div>
+                <div class="text-4xl font-bold" id="undergradEnrollments">1,523</div>
+            </div>
+            <div class="stat-card rounded-lg shadow-lg p-6 text-white text-center">
+                <div class="text-sm opacity-90 uppercase mb-2">Graduate</div>
+                <div class="text-4xl font-bold" id="gradEnrollments">124</div>
+            </div>
+            <div class="stat-card rounded-lg shadow-lg p-6 text-white text-center">
+                <div class="text-sm opacity-90 uppercase mb-2">Faculty</div>
+                <div class="text-4xl font-bold" id="facultyCount">140</div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="bg-white rounded-lg shadow-lg mb-8 overflow-hidden">
+            <div class="csun-red p-4">
+                <h2 class="text-white font-bold text-xl">Quick Actions</h2>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <button onclick="openPurchaseRequest()" class="action-button bg-white border-2 rounded-lg p-6 text-center shadow hover:shadow-lg">
+                        <i class="fas fa-shopping-cart text-4xl csun-red-text mb-3"></i>
+                        <div class="font-bold text-gray-800">Purchase Request</div>
+                        <div class="text-xs text-gray-500 mt-1">Hardware & Software</div>
+                    </button>
+                    
+                    <button onclick="openSupportRequest()" class="action-button bg-white border-2 rounded-lg p-6 text-center shadow hover:shadow-lg">
+                        <i class="fas fa-headset text-4xl csun-red-text mb-3"></i>
+                        <div class="font-bold text-gray-800">Support Request</div>
+                        <div class="text-xs text-gray-500 mt-1">Get Technical Help</div>
+                    </button>
+                    
+                    <button onclick="openRequestStatus()" class="action-button bg-white border-2 rounded-lg p-6 text-center shadow hover:shadow-lg">
+                        <i class="fas fa-clipboard-list text-4xl csun-red-text mb-3"></i>
+                        <div class="font-bold text-gray-800">View Requests</div>
+                        <div class="text-xs text-gray-500 mt-1">Track Your Tickets</div>
+                    </button>
+                    
+                    <button onclick="openKnowledgeBase()" class="action-button bg-white border-2 rounded-lg p-6 text-center shadow hover:shadow-lg">
+                        <i class="fas fa-book text-4xl csun-red-text mb-3"></i>
+                        <div class="font-bold text-gray-800">Knowledge Base</div>
+                        <div class="text-xs text-gray-500 mt-1">FAQs & Guides</div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Two Column Layout: Calendar & News -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Calendar Section -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div class="csun-red p-4 flex items-center justify-between">
+                    <h2 class="text-white font-bold text-xl">Department Calendar</h2>
+                    <div class="flex gap-2">
+                        <button onclick="previousMonth()" class="text-white hover:bg-red-800 px-3 py-1 rounded">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button onclick="nextMonth()" class="text-white hover:bg-red-800 px-3 py-1 rounded">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="text-center mb-4">
+                        <h3 class="text-2xl font-bold csun-red-text" id="calendarMonth"></h3>
+                    </div>
+                    <div class="grid grid-cols-7 gap-2 mb-2">
+                        <div class="text-center text-xs font-bold text-gray-600">SUN</div>
+                        <div class="text-center text-xs font-bold text-gray-600">MON</div>
+                        <div class="text-center text-xs font-bold text-gray-600">TUE</div>
+                        <div class="text-center text-xs font-bold text-gray-600">WED</div>
+                        <div class="text-center text-xs font-bold text-gray-600">THU</div>
+                        <div class="text-center text-xs font-bold text-gray-600">FRI</div>
+                        <div class="text-center text-xs font-bold text-gray-600">SAT</div>
+                    </div>
+                    <div id="calendarGrid" class="grid grid-cols-7 gap-2">
+                        <!-- Calendar days will be generated by JavaScript -->
+                    </div>
+                    <div class="mt-4 pt-4 border-t">
+                        <h4 class="font-bold text-sm mb-2 csun-red-text">Upcoming Events</h4>
+                        <div id="upcomingEvents" class="space-y-2 text-sm">
+                            <!-- Events will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- News & Announcements -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div class="csun-red p-4 flex items-center justify-between">
+                    <h2 class="text-white font-bold text-xl">News & Announcements</h2>
+                    <button onclick="openNewsEditor()" class="text-white hover:bg-red-800 px-3 py-1 rounded text-sm">
+                        <i class="fas fa-plus"></i> Add News
+                    </button>
+                </div>
+                <div class="p-6 space-y-4 max-h-[600px] overflow-y-auto" id="newsContainer">
+                    <!-- News items will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- IT Staff Contact Section -->
+        <div class="bg-white rounded-lg shadow-lg mt-8 overflow-hidden">
+            <div class="csun-red p-4">
+                <h2 class="text-white font-bold text-xl">IT Support Team</h2>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="staffContainer">
+                    <!-- Staff cards will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Chat Bubble -->
+    <div class="chat-bubble">
+        <button onclick="toggleChat()" class="csun-red text-white rounded-full w-16 h-16 shadow-lg hover:shadow-xl transition-all flex items-center justify-center">
+            <i class="fas fa-comments text-2xl" id="chatIcon"></i>
+        </button>
+    </div>
+
+    <!-- Chat Window -->
+    <div class="chat-window bg-white rounded-lg overflow-hidden" id="chatWindow">
+        <div class="csun-red p-4 flex items-center justify-between">
+            <h3 class="text-white font-bold">IT Support Chat</h3>
+            <button onclick="toggleChat()" class="text-white hover:bg-red-800 px-2 py-1 rounded">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="p-4 bg-gray-50 border-b">
+            <label class="block text-sm font-bold mb-2">Contact:</label>
+            <select id="staffSelect" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500">
+                <option value="">Select a staff member...</option>
+                <option value="brandon">Brandon - IT Consultant II</option>
+                <option value="jake">Jake - IT Support</option>
+                <option value="michael">Michael - IT Support</option>
+                <option value="rory">Rory - Lab Manager</option>
+                <option value="blanca">Blanca - Administrative Support</option>
+                <option value="joe">Joe - Technical Director</option>
+                <option value="rochelle">Rochelle - Office Manager</option>
+                <option value="leslie">Leslie - Department Chair</option>
+            </select>
+        </div>
+        
+        <div class="flex-1 p-4 h-80 overflow-y-auto bg-gray-50" id="chatMessages">
+            <div class="text-center text-gray-500 text-sm py-8">
+                Select a staff member to start chatting
+            </div>
+        </div>
+        
+        <div class="p-4 border-t bg-white">
+            <div class="flex gap-2">
+                <input 
+                    type="text" 
+                    id="chatInput" 
+                    placeholder="Type your message..." 
+                    class="flex-1 border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
+                    onkeypress="handleChatEnter(event)"
+                    disabled
+                >
+                <button onclick="sendMessage()" class="csun-red text-white px-4 py-2 rounded-lg hover:bg-red-800 disabled:opacity-50" id="sendButton" disabled>
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data - Replace with SharePoint integration
+        const newsItems = [
+            {
+                id: 1,
+                title: "New 3D Printers Available in Lab",
+                snippet: "Two new Ultimaker S5 printers are now available for student use. Sign up for training sessions...",
+                link: "https://example.com/3d-printers",
+                date: "2024-12-15",
+                type: "text"
+            },
+            {
+                id: 2,
+                title: "Holiday Lab Hours",
+                snippet: "Labs will be closed Dec 23 - Jan 2. Plan your projects accordingly...",
+                link: "",
+                date: "2024-12-10",
+                type: "text"
+            },
+            {
+                id: 3,
+                title: "Adobe Creative Cloud Update",
+                snippet: "All lab computers will be updated to CC 2024 during winter break...",
+                link: "https://example.com/adobe-update",
+                date: "2024-12-05",
+                type: "link"
+            }
+        ];
+
+        const staffMembers = [
+            { name: "Brandon Brathwaite", role: "IT Consultant II", email: "brandon.brathwaite@csun.edu", phone: "(818) 677-XXXX", office: "Art 110" },
+            { name: "Jake Smith", role: "IT Support", email: "jake.smith@csun.edu", phone: "(818) 677-XXXX", office: "Art 110" },
+            { name: "Michael Chen", role: "IT Support", email: "michael.chen@csun.edu", phone: "(818) 677-XXXX", office: "Art 110" },
+            { name: "Rory Johnson", role: "Lab Manager", email: "rory.johnson@csun.edu", phone: "(818) 677-XXXX", office: "Art 115" },
+            { name: "Blanca Rodriguez", role: "Administrative Support", email: "blanca.rodriguez@csun.edu", phone: "(818) 677-XXXX", office: "Art 100" },
+            { name: "Joe Martinez", role: "Technical Director", email: "joe.martinez@csun.edu", phone: "(818) 677-XXXX", office: "Art 105" },
+            { name: "Rochelle Davis", role: "Office Manager", email: "rochelle.davis@csun.edu", phone: "(818) 677-XXXX", office: "Art 100" },
+            { name: "Leslie Thompson", role: "Department Chair", email: "leslie.thompson@csun.edu", phone: "(818) 677-XXXX", office: "Art 120" }
+        ];
+
+        // Calendar events - Replace with Outlook integration
+        const calendarEvents = [
+            { date: "2024-12-20", title: "Faculty Meeting", time: "2:00 PM" },
+            { date: "2024-12-21", title: "Student Exhibition Opening", time: "6:00 PM" },
+            { date: "2024-12-23", title: "Labs Close for Winter Break", time: "All Day" }
+        ];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDate();
+            loadNews();
+            loadStaff();
+            initializeCalendar();
+        });
+
+        function updateDate() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', options);
+        }
+
+        function loadNews() {
+            const container = document.getElementById('newsContainer');
+            container.innerHTML = newsItems.map(item => `
+                <div class="news-card bg-gray-50 rounded-lg p-4 border-l-4 csun-red-border" onclick="openNews('${item.link || '#'}')">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <h3 class="font-bold csun-red-text mb-2">${item.title}</h3>
+                            <p class="text-sm text-gray-600 mb-2">${item.snippet}</p>
+                            <div class="flex items-center gap-4 text-xs text-gray-500">
+                                <span><i class="far fa-calendar"></i> ${new Date(item.date).toLocaleDateString()}</span>
+                                ${item.link ? '<span><i class="fas fa-external-link-alt"></i> External Link</span>' : ''}
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right csun-red-text ml-4"></i>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function loadStaff() {
+            const container = document.getElementById('staffContainer');
+            container.innerHTML = staffMembers.map(staff => `
+                <div class="bg-gray-50 rounded-lg p-4 border-t-4 csun-red-border">
+                    <div class="text-center mb-3">
+                        <div class="w-16 h-16 csun-red rounded-full flex items-center justify-center mx-auto mb-2">
+                            <span class="text-white text-2xl font-bold">${staff.name.split(' ').map(n => n[0]).join('')}</span>
+                        </div>
+                        <h3 class="font-bold text-gray-800">${staff.name}</h3>
+                        <p class="text-xs text-gray-500">${staff.role}</p>
+                    </div>
+                    <div class="space-y-1 text-xs">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-envelope csun-red-text w-4"></i>
+                            <a href="mailto:${staff.email}" class="text-gray-600 hover:text-red-600">${staff.email}</a>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-phone csun-red-text w-4"></i>
+                            <span class="text-gray-600">${staff.phone}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-map-marker-alt csun-red-text w-4"></i>
+                            <span class="text-gray-600">${staff.office}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Calendar Functions
+        let currentDate = new Date();
+
+        function initializeCalendar() {
+            renderCalendar();
+            loadUpcomingEvents();
+        }
+
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            document.getElementById('calendarMonth').textContent = 
+                currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '';
+            
+            // Empty cells before first day
+            for (let i = 0; i < firstDay; i++) {
+                grid.innerHTML += '<div class="p-2"></div>';
+            }
+            
+            // Calendar days
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const hasEvent = calendarEvents.some(e => e.date === dateStr);
+                const isToday = dateStr === new Date().toISOString().split('T')[0];
+                
+                grid.innerHTML += `
+                    <div class="calendar-day p-2 rounded text-center cursor-pointer ${hasEvent ? 'has-event' : ''} ${isToday ? 'bg-red-100 font-bold' : ''}" 
+                         onclick="showDayEvents('${dateStr}')">
+                        <div class="text-sm">${day}</div>
+                        ${hasEvent ? '<div class="w-1 h-1 csun-red rounded-full mx-auto mt-1"></div>' : ''}
+                    </div>
+                `;
+            }
+        }
+
+        function previousMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        }
+
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        }
+
+        function loadUpcomingEvents() {
+            const container = document.getElementById('upcomingEvents');
+            const upcoming = calendarEvents
+                .filter(e => new Date(e.date) >= new Date())
+                .sort((a, b) => new Date(a.date) - new Date(b.date))
+                .slice(0, 5);
+            
+            if (upcoming.length === 0) {
+                container.innerHTML = '<div class="text-gray-500 text-xs">No upcoming events</div>';
+                return;
+            }
+            
+            container.innerHTML = upcoming.map(event => `
+                <div class="flex items-start gap-2 pb-2 border-b">
+                    <i class="fas fa-calendar-day csun-red-text mt-1"></i>
+                    <div class="flex-1">
+                        <div class="font-bold text-xs">${event.title}</div>
+                        <div class="text-xs text-gray-500">${new Date(event.date).toLocaleDateString()} - ${event.time}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showDayEvents(dateStr) {
+            const events = calendarEvents.filter(e => e.date === dateStr);
+            if (events.length > 0) {
+                alert(`Events on ${new Date(dateStr).toLocaleDateString()}:\n\n${events.map(e => `${e.title} - ${e.time}`).join('\n')}`);
+            }
+        }
+
+        // Chat Functions
+        function toggleChat() {
+            const chatWindow = document.getElementById('chatWindow');
+            const chatIcon = document.getElementById('chatIcon');
+            
+            if (chatWindow.classList.contains('active')) {
+                chatWindow.classList.remove('active');
+                chatIcon.className = 'fas fa-comments text-2xl';
+            } else {
+                chatWindow.classList.add('active');
+                chatIcon.className = 'fas fa-times text-2xl';
+            }
+        }
+
+        document.getElementById('staffSelect').addEventListener('change', function() {
+            const selected = this.value;
+            const chatInput = document.getElementById('chatInput');
+            const sendButton = document.getElementById('sendButton');
+            const messagesDiv = document.getElementById('chatMessages');
+            
+            if (selected) {
+                chatInput.disabled = false;
+                sendButton.disabled = false;
+                chatInput.focus();
+                messagesDiv.innerHTML = `
+                    <div class="text-center text-gray-500 text-sm py-4">
+                        <i class="fas fa-comment-dots text-3xl csun-red-text mb-2"></i>
+                        <p>Chat with ${this.options[this.selectedIndex].text}</p>
+                        <p class="text-xs mt-2">Messages are sent via Microsoft Teams</p>
+                    </div>
+                `;
+            } else {
+                chatInput.disabled = true;
+                sendButton.disabled = true;
+                messagesDiv.innerHTML = '<div class="text-center text-gray-500 text-sm py-8">Select a staff member to start chatting</div>';
+            }
+        });
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            const selectedStaff = document.getElementById('staffSelect').value;
+            
+            if (!message || !selectedStaff) return;
+            
+            const messagesDiv = document.getElementById('chatMessages');
+            const timestamp = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+            
+            messagesDiv.innerHTML += `
+                <div class="mb-4 flex justify-end">
+                    <div class="bg-red-100 rounded-lg px-4 py-2 max-w-xs">
+                        <p class="text-sm">${message}</p>
+                        <p class="text-xs text-gray-500 mt-1">${timestamp}</p>
+                    </div>
+                </div>
+            `;
+            
+            input.value = '';
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            
+            // Here you would integrate with Microsoft Teams API
+            console.log(`Sending to ${selectedStaff}: ${message}`);
+            
+            // Simulate response
+            setTimeout(() => {
+                messagesDiv.innerHTML += `
+                    <div class="mb-4 flex justify-start">
+                        <div class="bg-gray-200 rounded-lg px-4 py-2 max-w-xs">
+                            <p class="text-sm">Message received! I'll get back to you shortly.</p>
+                            <p class="text-xs text-gray-500 mt-1">${new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</p>
+                        </div>
+                    </div>
+                `;
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }, 1000);
+        }
+
+        function handleChatEnter(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // Navigation Functions
+        function openPurchaseRequest() {
+            window.open('purchase-request.html', '_blank');
+        }
+
+        function openSupportRequest() {
+            window.open('support-request.html', '_blank');
+        }
+
+        function openRequestStatus() {
+            window.open('request-status.html', '_blank');
+        }
+
+        function openKnowledgeBase() {
+            window.open('knowledge-base.html', '_blank');
+        }
+
+        function openNews(link) {
+            if (link && link !== '#') {
+                window.open(link, '_blank');
+            }
+        }
+
+        function openNewsEditor() {
+            window.open('news-editor.html', '_blank');
+        }
+    </script>
+</body>
+</html>
