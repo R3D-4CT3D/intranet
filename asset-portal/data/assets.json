@@ -1,0 +1,59 @@
+{
+  "assets": [
+    {
+      "id": "AST-001",
+      "name": "Dell OptiPlex 7090",
+      "category": "Computer",
+      "type": "Desktop",
+      "serialNumber": "DELL-7090-ABC123",
+      "csunTag": "CSUN-AD-0001",
+      "location": "Art 110",
+      "status": "Available",
+      "condition": "Good",
+      "purchaseDate": "2023-08-15",
+      "warrantyExpiry": "2026-08-15",
+      "assignedTo": null,
+      "notes": "Main office workstation",
+      "lastUpdated": "2024-01-15"
+    },
+    {
+      "id": "AST-002",
+      "name": "MacBook Pro 16\" M3",
+      "category": "Computer",
+      "type": "Laptop",
+      "serialNumber": "APPLE-MBP-XYZ789",
+      "csunTag": "CSUN-AD-0002",
+      "location": "Art 115",
+      "status": "Checked Out",
+      "condition": "Excellent",
+      "purchaseDate": "2024-01-10",
+      "warrantyExpiry": "2027-01-10",
+      "assignedTo": "Prof. Johnson",
+      "notes": "Faculty laptop - Animation",
+      "lastUpdated": "2024-01-15"
+    }
+  ],
+  "categories": ["Computer", "Monitor", "Printer", "Camera", "Audio", "Lighting", "Accessories", "Software License", "Other"],
+  "types": {
+    "Computer": ["Desktop", "Laptop", "Workstation", "Mac Pro", "iMac"],
+    "Monitor": ["24 inch", "27 inch", "32 inch", "4K", "Ultrawide"],
+    "Printer": ["Inkjet", "Laser", "Large Format", "3D Printer"],
+    "Camera": ["DSLR", "Mirrorless", "Video", "Action Cam", "Webcam"],
+    "Audio": ["Microphone", "Headphones", "Speakers", "Audio Interface", "Mixer"],
+    "Lighting": ["LED Panel", "Softbox", "Ring Light", "Strobe", "Continuous"],
+    "Accessories": ["Tripod", "Memory Card", "Cable", "Adapter", "Case"],
+    "Software License": ["Adobe CC", "Microsoft 365", "AutoCAD", "Maya", "Other"],
+    "Other": ["Miscellaneous"]
+  },
+  "statuses": ["Available", "Checked Out", "In Repair", "Reserved", "Retired", "Lost"],
+  "conditions": ["Excellent", "Good", "Fair", "Poor", "Non-functional"],
+  "locations": [
+    "AC 100", "AC 101", "AC 102", "AC 103", "AC 104", "AC 110", "AC 120", "AC 122", "AC 124", "AC 126", "AC 127", "AC 128",
+    "AC 200", "AC 201", "AC 202", "AC 203", "AC 204", "AC 204A", "AC 204B", "AC 204C", "AC 205", "AC 206", "AC 210", "AC 210A", "AC 211",
+    "AC 300", "AC 301", "AC 301A", "AC 313", "AC 316", "AC 317", "AC 317A", "AC 318", "AC 318A", "AC 318B", "AC 318C", "AC 318D", "AC 319", "AC 320", "AC 320A", "AC 321", "AC 321A", "AC 321B", "AC 322", "AC 323", "AC 324",
+    "AC 400", "AC 401", "AC 402", "AC 403", "AC 404", "AC 405", "AC 407", "AC 407A", "AC 408", "AC 408D", "AC 409", "AC 410", "AC 411",
+    "AC 500", "AC 500A", "AC 500B", "AC 501", "AC 502", "AC 503", "AC 504", "AC 504A", "AC 505", "AC 506", "AC 506A", "AC 507", "AC 508", "AC 509", "AC 510", "AC 510A", "AC 510B", "AC 510C", "AC 510D", "AC 511", "AC 511B", "AC 512", "AC 512A", "AC 512B", "AC 512D",
+    "AC 600", "AC 600A", "AC 600B", "AC 600C", "AC 602", "AC 604", "AC 606",
+    "Storage", "Other"
+  ]
+}

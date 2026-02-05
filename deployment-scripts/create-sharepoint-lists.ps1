@@ -17,7 +17,17 @@ Write-Host "Site URL: $siteUrl" -ForegroundColor Gray
 Write-Host ""
 
 try {
-    Connect-PnPOnline -Url $siteUrl -Interactive
+    # IMPORTANT: Replace this with your own Azure AD App Client ID!
+    # See deployment guide for instructions on creating an Azure AD App Registration
+    $clientId = "YOUR-CLIENT-ID-HERE"
+
+    if ($clientId -eq "YOUR-CLIENT-ID-HERE") {
+        Write-Host "❌ Error: Please update the Client ID in the script!" -ForegroundColor Red
+        Write-Host "Follow the instructions in the deployment guide to create an Azure AD App Registration." -ForegroundColor Yellow
+        exit 1
+    }
+
+    Connect-PnPOnline -Url $siteUrl -Interactive -ClientId $clientId
     Write-Host "✅ Connected successfully!" -ForegroundColor Green
     Write-Host ""
 } catch {
@@ -118,26 +128,67 @@ if (Create-ListIfNotExists -ListTitle "SupportRequests" -Template "GenericList")
 }
 Write-Host ""
 
-# 3. News & Announcements List
-Write-Host "3️⃣  NEWS & ANNOUNCEMENTS LIST" -ForegroundColor Cyan
-if (Create-ListIfNotExists -ListTitle "NewsAnnouncements" -Template "GenericList") {
+# 3. Portal News List (Title + Link)
+Write-Host "3️⃣  PORTAL NEWS LIST" -ForegroundColor Cyan
+$newsListCreated = Create-ListIfNotExists -ListTitle "PortalNews" -Template "GenericList"
+if ($newsListCreated) {
     Start-Sleep -Seconds 2
-    Add-FieldIfNotExists -ListName "NewsAnnouncements" -FieldName "Content" -FieldType "Note" -Required $true
-    Add-FieldIfNotExists -ListName "NewsAnnouncements" -FieldName "Link" -FieldType "URL"
-    Add-FieldIfNotExists -ListName "NewsAnnouncements" -FieldName "PublishedDate" -FieldType "DateTime" -Required $true
-    Add-FieldIfNotExists -ListName "NewsAnnouncements" -FieldName "ExpirationDate" -FieldType "DateTime"
+    # Title field already exists by default
+    Add-FieldIfNotExists -ListName "PortalNews" -FieldName "Link" -FieldType "URL"
+
+    # Add sample news items
+    Write-Host "  Adding sample news items..." -ForegroundColor Gray
+    try {
+        Add-PnPListItem -List "PortalNews" -Values @{
+            "Title" = "Welcome to the New Portal!"
+            "Link" = "https://www.csun.edu/mike-curb-arts-media-communication/art"
+        }
+        Add-PnPListItem -List "PortalNews" -Values @{
+            "Title" = "Spring 2025 Lab Hours Posted"
+        }
+        Write-Host "  ✅ Sample news added" -ForegroundColor Green
+    } catch {
+        Write-Host "  ⚠️  Could not add sample news: $($_.Exception.Message)" -ForegroundColor DarkYellow
+    }
 }
 Write-Host ""
 
-# 4. Department Stats List
-Write-Host "4️⃣  DEPARTMENT STATS LIST" -ForegroundColor Cyan
-if (Create-ListIfNotExists -ListTitle "DepartmentStats" -Template "GenericList") {
+# 4. Portal Stats List (Label + Value pairs)
+Write-Host "4️⃣  PORTAL STATS LIST" -ForegroundColor Cyan
+$statsListCreated = Create-ListIfNotExists -ListTitle "PortalStats" -Template "GenericList"
+if ($statsListCreated) {
     Start-Sleep -Seconds 2
-    Add-FieldIfNotExists -ListName "DepartmentStats" -FieldName "TotalEnrollments" -FieldType "Number" -Required $true
-    Add-FieldIfNotExists -ListName "DepartmentStats" -FieldName "UndergradEnrollments" -FieldType "Number" -Required $true
-    Add-FieldIfNotExists -ListName "DepartmentStats" -FieldName "GradEnrollments" -FieldType "Number" -Required $true
-    Add-FieldIfNotExists -ListName "DepartmentStats" -FieldName "FacultyCount" -FieldType "Number" -Required $true
-    Add-FieldIfNotExists -ListName "DepartmentStats" -FieldName "LastUpdated" -FieldType "DateTime" -Required $true
+    # Title field = Label name (e.g., "Total Enrollments")
+    Add-FieldIfNotExists -ListName "PortalStats" -FieldName "StatValue" -FieldType "Text" -Required $true
+    Add-FieldIfNotExists -ListName "PortalStats" -FieldName "SortOrder" -FieldType "Number" -Required $true
+
+    # Add default stats
+    Write-Host "  Adding default stats..." -ForegroundColor Gray
+    try {
+        Add-PnPListItem -List "PortalStats" -Values @{
+            "Title" = "Total Enrollments"
+            "StatValue" = "1,647"
+            "SortOrder" = 1
+        }
+        Add-PnPListItem -List "PortalStats" -Values @{
+            "Title" = "Undergraduate"
+            "StatValue" = "1,523"
+            "SortOrder" = 2
+        }
+        Add-PnPListItem -List "PortalStats" -Values @{
+            "Title" = "Graduate"
+            "StatValue" = "124"
+            "SortOrder" = 3
+        }
+        Add-PnPListItem -List "PortalStats" -Values @{
+            "Title" = "Faculty"
+            "StatValue" = "140"
+            "SortOrder" = 4
+        }
+        Write-Host "  ✅ Default stats added" -ForegroundColor Green
+    } catch {
+        Write-Host "  ⚠️  Could not add default stats: $($_.Exception.Message)" -ForegroundColor DarkYellow
+    }
 }
 Write-Host ""
 
@@ -148,15 +199,22 @@ Write-Host "✅ DEPLOYMENT COMPLETE!" -ForegroundColor Green
 Write-Host "================================================" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Created Lists:" -ForegroundColor Yellow
-Write-Host "  1. PurchaseRequests" -ForegroundColor White
-Write-Host "  2. SupportRequests" -ForegroundColor White
-Write-Host "  3. NewsAnnouncements" -ForegroundColor White
-Write-Host "  4. DepartmentStats" -ForegroundColor White
+Write-Host "  1. PurchaseRequests  - For purchase request forms" -ForegroundColor White
+Write-Host "  2. SupportRequests   - For support ticket forms" -ForegroundColor White
+Write-Host "  3. PortalNews        - News/announcements (Title + Link)" -ForegroundColor White
+Write-Host "  4. PortalStats       - Department statistics" -ForegroundColor White
+Write-Host ""
+Write-Host "To update the portal:" -ForegroundColor Yellow
+Write-Host "  - Stats: Edit items in 'PortalStats' list" -ForegroundColor White
+Write-Host "  - News:  Add items to 'PortalNews' list (Title + optional Link)" -ForegroundColor White
+Write-Host "  - Staff: Add/remove members from your M365 Team" -ForegroundColor White
 Write-Host ""
 Write-Host "Next Steps:" -ForegroundColor Yellow
-Write-Host "  1. Deploy the .sppkg file to App Catalog" -ForegroundColor White
-Write-Host "  2. Approve API permissions in SharePoint Admin" -ForegroundColor White
-Write-Host "  3. Add the web part to your site" -ForegroundColor White
+Write-Host "  1. Create an M365 Team for 'Art & Design Department Staff'" -ForegroundColor White
+Write-Host "  2. Update the portal HTML with your SharePoint site URL" -ForegroundColor White
+Write-Host "  3. Update the portal HTML with your Team's Group ID" -ForegroundColor White
+Write-Host "  4. Upload portal-template.html to Site Assets" -ForegroundColor White
+Write-Host "  5. Embed on a SharePoint page using iframe" -ForegroundColor White
 Write-Host ""
 Write-Host "================================================" -ForegroundColor Cyan
 

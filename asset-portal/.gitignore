@@ -1,0 +1,22 @@
+# env / secrets
+.env
+.env.*
+
+# logs
+*.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*~
+
+# local tools
+.claude/
+.cache/
+coverage/
+node_modules/
+dist/
+build/

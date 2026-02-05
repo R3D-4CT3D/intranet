@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipment Checkout - CSUN Art & Design</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .csun-red { background-color: #CE1126; }
+        .csun-red-text { color: #CE1126; }
+        .csun-red-border { border-color: #CE1126; }
+        .csun-red-hover:hover { background-color: #a00e1f; }
+        .modal { display: none; }
+        .modal.active { display: flex; }
+        .status-active { background-color: #dbeafe; color: #1e40af; }
+        .status-returned { background-color: #dcfce7; color: #166534; }
+        .status-overdue { background-color: #fee2e2; color: #991b1b; }
+        .status-lost { background-color: #fef3c7; color: #92400e; }
+        .equipment-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #f3f4f6;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            margin: 0.125rem;
+        }
+        .equipment-tag.returned {
+            background: #dcfce7;
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Header -->
+    <header class="csun-red text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <a href="index.html" class="hover:bg-white/20 p-2 rounded-lg transition">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                    <div>
+                        <h1 class="text-2xl font-bold">Equipment Checkout</h1>
+                        <p class="text-sm opacity-90">Track equipment loans to students and faculty</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="exportCheckouts()" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg text-sm transition">
+                        <i class="fas fa-download mr-2"></i>Export CSV
+                    </button>
+                    <button onclick="openCheckoutModal()" class="bg-white hover:bg-gray-100 text-gray-800 px-4 py-2 rounded-lg text-sm font-medium transition">
+                        <i class="fas fa-plus mr-2"></i>New Checkout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Stats Row -->
+    <div class="max-w-7xl mx-auto px-6 py-4">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-white rounded-lg shadow p-4 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+                    <i class="fas fa-hand-holding text-blue-600 text-xl"></i>
+                </div>
+                <div>
+                    <div class="text-2xl font-bold" id="statActive">0</div>
+                    <div class="text-xs text-gray-500 uppercase">Active</div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+                    <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+                </div>
+                <div>
+                    <div class="text-2xl font-bold" id="statOverdue">0</div>
+                    <div class="text-xs text-gray-500 uppercase">Overdue</div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
+                    <i class="fas fa-laptop text-purple-600 text-xl"></i>
+                </div>
+                <div>
+                    <div class="text-2xl font-bold" id="statEquipmentOut">0</div>
+                    <div class="text-xs text-gray-500 uppercase">Items Out</div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+                    <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                </div>
+                <div>
+                    <div class="text-2xl font-bold" id="statReturned">0</div>
+                    <div class="text-xs text-gray-500 uppercase">Returned</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="max-w-7xl mx-auto px-6 pb-4">
+        <div class="bg-white rounded-xl shadow-lg p-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Search</label>
+                    <input type="text" id="searchInput" placeholder="Name, Student ID, email..."
+                           class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                           oninput="filterCheckouts()">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Status</label>
+                    <select id="filterStatus" class="w-full border rounded-lg px-3 py-2 text-sm" onchange="filterCheckouts()">
+                        <option value="">All Statuses</option>
+                        <option value="Active">Active</option>
+                        <option value="Overdue">Overdue</option>
+                        <option value="Returned">Returned</option>
+                        <option value="Lost">Lost</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Borrower Type</label>
+                    <select id="filterBorrowerType" class="w-full border rounded-lg px-3 py-2 text-sm" onchange="filterCheckouts()">
+                        <option value="">All Types</option>
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <button onclick="clearFilters()" class="w-full bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg text-sm transition">
+                        <i class="fas fa-times mr-2"></i>Clear
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkouts List -->
+    <div class="max-w-7xl mx-auto px-6 pb-8">
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div id="checkoutsList" class="divide-y">
+                <div class="text-center py-12 text-gray-400">
+                    <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                    <p>Loading checkouts...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Checkout Modal -->
+    <div id="checkoutModal" class="modal fixed inset-0 bg-black/50 items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="csun-red p-4 flex items-center justify-between sticky top-0 z-10">
+                <h2 class="text-white font-bold text-lg">New Equipment Checkout</h2>
+                <button onclick="closeCheckoutModal()" class="text-white hover:bg-white/20 p-2 rounded-lg transition">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="checkoutForm" class="p-6 space-y-6">
+                <!-- Borrower Information -->
+                <div class="border-b pb-4">
+                    <h3 class="font-semibold text-gray-700 mb-4"><i class="fas fa-user mr-2"></i>Borrower Information</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
+                            <input type="text" id="fullName" required placeholder="John Smith"
+                                   class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Student ID</label>
+                            <input type="text" id="studentId" placeholder="12345678" maxlength="9"
+                                   class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Borrower Type *</label>
+                            <select id="borrowerType" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500">
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">CSUN Email *</label>
+                            <input type="email" id="csunEmail" required placeholder="name@csun.edu"
+                                   class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Personal Email</label>
+                            <input type="email" id="personalEmail" placeholder="name@gmail.com"
+                                   class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
+                            <input type="tel" id="phoneNumber" required placeholder="(818) 555-0100"
+                                   class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Equipment Section -->
+                <div class="border-b pb-4">
+                    <h3 class="font-semibold text-gray-700 mb-4"><i class="fas fa-laptop mr-2"></i>Equipment</h3>
+                    <div id="equipmentList" class="space-y-2 mb-4">
+                        <!-- Equipment items will be added here -->
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
+                        <select id="newEquipmentType" class="border rounded-lg px-3 py-2 text-sm">
+                            <option value="Laptop">Laptop</option>
+                            <option value="Display Tablet">Display Tablet</option>
+                            <option value="Non-Display Tablet">Non-Display Tablet</option>
+                            <option value="Monitor">Monitor</option>
+                            <option value="Camera">Camera</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <input type="text" id="newEquipmentName" placeholder="Equipment name"
+                               class="border rounded-lg px-3 py-2 text-sm md:col-span-2">
+                        <input type="text" id="newEquipmentTag" placeholder="Asset tag"
+                               class="border rounded-lg px-3 py-2 text-sm">
+                    </div>
+                    <button type="button" onclick="addEquipmentItem()"
+                            class="mt-2 text-sm text-red-600 hover:text-red-800 font-medium">
+                        <i class="fas fa-plus mr-1"></i>Add Equipment
+                    </button>
+                </div>
+
+                <!-- Checkout Details -->
+                <div>
+                    <h3 class="font-semibold text-gray-700 mb-4"><i class="fas fa-calendar mr-2"></i>Checkout Details</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Due Date *</label>
+                            <input type="date" id="dueDate" required
+                                   class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Checked Out By</label>
+                            <input type="text" id="checkedOutBy" placeholder="Staff name"
+                                   class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Purpose</label>
+                            <textarea id="checkoutPurpose" rows="2" placeholder="Reason for checkout..."
+                                      class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500"></textarea>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                            <textarea id="checkoutNotes" rows="2"
+                                      class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 pt-4 border-t">
+                    <button type="button" onclick="closeCheckoutModal()"
+                            class="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50 transition">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                            class="flex-1 csun-red csun-red-hover text-white px-4 py-2 rounded-lg transition">
+                        <i class="fas fa-check mr-2"></i>Complete Checkout
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View/Return Modal -->
+    <div id="viewModal" class="modal fixed inset-0 bg-black/50 items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div class="csun-red p-4 flex items-center justify-between sticky top-0">
+                <h2 class="text-white font-bold text-lg">Checkout Details</h2>
+                <button onclick="closeViewModal()" class="text-white hover:bg-white/20 p-2 rounded-lg transition">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="viewModalContent" class="p-6">
+                <!-- Content populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/dataService.js"></script>
+    <script src="js/checkouts.js"></script>
+</body>
+</html>

@@ -143,7 +143,7 @@ Update the choices array in `deployment-scripts/create-sharepoint-lists.ps1`
 
 ## 👥 Contributors
 
-- Brandon Brathwaite - IT Consultant II (brandon.brathwaite@csun.edu)
+- Brandon Kakudo - IT Consultant II (brandon.kakudo@csun.edu)
 
 ## 📄 License
 

@@ -1,0 +1,120 @@
+{
+  "software": [
+    {
+      "id": "SW-001",
+      "name": "Adobe Creative Cloud",
+      "vendor": "Adobe",
+      "version": "2024",
+      "licenseType": "Subscription",
+      "totalLicenses": 150,
+      "usedLicenses": 142,
+      "cost": 4500.00,
+      "billingCycle": "Annual",
+      "purchaseDate": "2024-01-15",
+      "renewalDate": "2025-01-15",
+      "assignmentType": "Lab",
+      "assignedTo": "All Computer Labs",
+      "assignedAssets": [],
+      "category": "Design Software",
+      "status": "Active",
+      "notes": "Includes Photoshop, Illustrator, InDesign, Premiere, After Effects",
+      "supportContact": {
+        "name": "Adobe Enterprise Support",
+        "email": "enterprise-support@adobe.com",
+        "phone": "1-800-833-6687",
+        "accountRep": "Jennifer Walsh"
+      },
+      "lastUpdated": "2024-01-15"
+    },
+    {
+      "id": "SW-002",
+      "name": "Autodesk Maya",
+      "vendor": "Autodesk",
+      "version": "2024",
+      "licenseType": "Subscription",
+      "totalLicenses": 30,
+      "usedLicenses": 28,
+      "cost": 1785.00,
+      "billingCycle": "Annual",
+      "purchaseDate": "2024-02-01",
+      "renewalDate": "2025-02-01",
+      "assignmentType": "Lab",
+      "assignedTo": "Animation Lab (Art 115)",
+      "assignedAssets": [],
+      "category": "3D/Animation",
+      "status": "Active",
+      "notes": "Education license - includes Arnold renderer",
+      "supportContact": {
+        "name": "Autodesk Education",
+        "email": "education.support@autodesk.com",
+        "phone": "1-800-964-6432",
+        "accountRep": "Mike Thompson"
+      },
+      "lastUpdated": "2024-02-01"
+    },
+    {
+      "id": "SW-003",
+      "name": "Microsoft 365 Education",
+      "vendor": "Microsoft",
+      "version": "E5",
+      "licenseType": "Subscription",
+      "totalLicenses": 200,
+      "usedLicenses": 165,
+      "cost": 0,
+      "billingCycle": "Annual",
+      "purchaseDate": "2023-08-01",
+      "renewalDate": "2025-08-01",
+      "assignmentType": "Mixed",
+      "assignedTo": "Faculty & Staff + Labs",
+      "assignedAssets": [],
+      "category": "Productivity",
+      "status": "Active",
+      "notes": "Free through CSUN campus agreement",
+      "supportContact": {
+        "name": "CSUN IT Help Desk",
+        "email": "helpdesk@csun.edu",
+        "phone": "(818) 677-1400",
+        "accountRep": ""
+      },
+      "lastUpdated": "2023-08-01"
+    }
+  ],
+  "categories": [
+    "Design Software",
+    "3D/Animation",
+    "Video Editing",
+    "Audio Production",
+    "Productivity",
+    "Development Tools",
+    "Utilities",
+    "Operating System",
+    "Other"
+  ],
+  "licenseTypes": [
+    "Subscription",
+    "Perpetual",
+    "Site License",
+    "Per-Seat",
+    "Floating",
+    "Free/Open Source"
+  ],
+  "assignmentTypes": [
+    "Lab",
+    "Individual",
+    "Department-Wide",
+    "Mixed"
+  ],
+  "billingCycles": [
+    "Monthly",
+    "Annual",
+    "Multi-Year",
+    "One-Time"
+  ],
+  "statuses": [
+    "Active",
+    "Expiring Soon",
+    "Expired",
+    "Cancelled",
+    "Pending Renewal"
+  ]
+}

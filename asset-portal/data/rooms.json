@@ -1,0 +1,308 @@
+{
+  "rooms": [
+    {
+      "id": "ROOM-001",
+      "roomNumber": "Art 100",
+      "name": "Main Office",
+      "building": "Art Building",
+      "floor": "1",
+      "type": "Office",
+      "capacity": 4,
+      "primaryContact": "Rochelle Davis",
+      "equipment": [
+        {
+          "id": "EQ-001",
+          "type": "Computer",
+          "name": "Dell OptiPlex 7090",
+          "assetTag": "CSUN-AD-0100",
+          "serialNumber": "DELL-7090-001",
+          "status": "Working",
+          "notes": "Front desk workstation"
+        },
+        {
+          "id": "EQ-002",
+          "type": "Display",
+          "name": "Samsung 55\" Smart TV",
+          "assetTag": "CSUN-AD-0101",
+          "serialNumber": "SAM-55-001",
+          "status": "Working",
+          "notes": "Wall mounted - lobby display"
+        },
+        {
+          "id": "EQ-003",
+          "type": "Printer",
+          "name": "HP LaserJet Pro",
+          "assetTag": "CSUN-AD-0102",
+          "serialNumber": "HP-LJ-001",
+          "status": "Working",
+          "notes": "Shared office printer"
+        }
+      ],
+      "notes": "Main department office - open 8am-5pm",
+      "lastUpdated": "2024-01-15"
+    },
+    {
+      "id": "ROOM-002",
+      "roomNumber": "Art 105",
+      "name": "Conference Room",
+      "building": "Art Building",
+      "floor": "1",
+      "type": "Conference",
+      "capacity": 12,
+      "primaryContact": "Joe Martinez",
+      "equipment": [
+        {
+          "id": "EQ-004",
+          "type": "Computer",
+          "name": "Mac Mini M2",
+          "assetTag": "CSUN-AD-0105",
+          "serialNumber": "APPLE-MM-001",
+          "status": "Working",
+          "notes": "Presentation computer"
+        },
+        {
+          "id": "EQ-005",
+          "type": "Display",
+          "name": "Epson Projector",
+          "assetTag": "CSUN-AD-0106",
+          "serialNumber": "EPSON-001",
+          "status": "Working",
+          "notes": "Ceiling mounted"
+        },
+        {
+          "id": "EQ-006",
+          "type": "Other",
+          "name": "Logitech Conference Cam",
+          "assetTag": "CSUN-AD-0107",
+          "serialNumber": "LOGI-CC-001",
+          "status": "Working",
+          "notes": "For Zoom meetings"
+        }
+      ],
+      "notes": "Faculty meetings, reviews, presentations",
+      "lastUpdated": "2024-01-15"
+    },
+    {
+      "id": "ROOM-003",
+      "roomNumber": "Art 110",
+      "name": "IT Office",
+      "building": "Art Building",
+      "floor": "1",
+      "type": "Office",
+      "capacity": 4,
+      "primaryContact": "Brandon Brathwaite",
+      "equipment": [
+        {
+          "id": "EQ-007",
+          "type": "Computer",
+          "name": "Dell OptiPlex 7090",
+          "assetTag": "CSUN-AD-0110A",
+          "serialNumber": "DELL-7090-002",
+          "status": "Working",
+          "notes": "Brandon's workstation"
+        },
+        {
+          "id": "EQ-008",
+          "type": "Computer",
+          "name": "Dell OptiPlex 7090",
+          "assetTag": "CSUN-AD-0110B",
+          "serialNumber": "DELL-7090-003",
+          "status": "Working",
+          "notes": "Jake's workstation"
+        },
+        {
+          "id": "EQ-009",
+          "type": "Display",
+          "name": "Dell 27\" Monitor",
+          "assetTag": "CSUN-AD-0111",
+          "serialNumber": "DELL-MON-001",
+          "status": "Working",
+          "notes": ""
+        }
+      ],
+      "notes": "IT Support office",
+      "lastUpdated": "2024-01-15"
+    },
+    {
+      "id": "ROOM-004",
+      "roomNumber": "Art 115",
+      "name": "Animation Lab",
+      "building": "Art Building",
+      "floor": "1",
+      "type": "Lab",
+      "capacity": 25,
+      "primaryContact": "Rory Johnson",
+      "equipment": [
+        {
+          "id": "EQ-010",
+          "type": "Computer",
+          "name": "iMac 27\" (Station 1)",
+          "assetTag": "CSUN-AD-0115-01",
+          "serialNumber": "APPLE-IMAC-001",
+          "status": "Working",
+          "notes": "Student workstation"
+        },
+        {
+          "id": "EQ-011",
+          "type": "Computer",
+          "name": "iMac 27\" (Station 2)",
+          "assetTag": "CSUN-AD-0115-02",
+          "serialNumber": "APPLE-IMAC-002",
+          "status": "Working",
+          "notes": "Student workstation"
+        },
+        {
+          "id": "EQ-012",
+          "type": "Computer",
+          "name": "iMac 27\" (Station 3)",
+          "assetTag": "CSUN-AD-0115-03",
+          "serialNumber": "APPLE-IMAC-003",
+          "status": "Working",
+          "notes": "Student workstation"
+        },
+        {
+          "id": "EQ-013",
+          "type": "Computer",
+          "name": "iMac 27\" (Station 4)",
+          "assetTag": "CSUN-AD-0115-04",
+          "serialNumber": "APPLE-IMAC-004",
+          "status": "In Repair",
+          "notes": "Display issue - ticket #1234"
+        },
+        {
+          "id": "EQ-014",
+          "type": "Computer",
+          "name": "iMac 27\" (Station 5)",
+          "assetTag": "CSUN-AD-0115-05",
+          "serialNumber": "APPLE-IMAC-005",
+          "status": "Working",
+          "notes": "Student workstation"
+        },
+        {
+          "id": "EQ-015",
+          "type": "Computer",
+          "name": "Mac Pro (Instructor)",
+          "assetTag": "CSUN-AD-0115-INST",
+          "serialNumber": "APPLE-MP-001",
+          "status": "Working",
+          "notes": "Instructor station"
+        },
+        {
+          "id": "EQ-016",
+          "type": "Display",
+          "name": "Epson Projector",
+          "assetTag": "CSUN-AD-0115-PROJ",
+          "serialNumber": "EPSON-002",
+          "status": "Working",
+          "notes": "Main display - ceiling mounted"
+        },
+        {
+          "id": "EQ-017",
+          "type": "Printer",
+          "name": "Canon imagePROGRAF",
+          "assetTag": "CSUN-AD-0115-PRN",
+          "serialNumber": "CANON-LF-001",
+          "status": "Working",
+          "notes": "Large format printer"
+        }
+      ],
+      "notes": "Animation and Motion Graphics lab - Maya, After Effects",
+      "lastUpdated": "2024-01-15"
+    },
+    {
+      "id": "ROOM-005",
+      "roomNumber": "Art 120",
+      "name": "Photo Lab",
+      "building": "Art Building",
+      "floor": "1",
+      "type": "Lab",
+      "capacity": 20,
+      "primaryContact": "Rory Johnson",
+      "equipment": [
+        {
+          "id": "EQ-018",
+          "type": "Computer",
+          "name": "iMac 27\" (Edit Bay 1)",
+          "assetTag": "CSUN-AD-0120-01",
+          "serialNumber": "APPLE-IMAC-010",
+          "status": "Working",
+          "notes": "Photo editing station"
+        },
+        {
+          "id": "EQ-019",
+          "type": "Computer",
+          "name": "iMac 27\" (Edit Bay 2)",
+          "assetTag": "CSUN-AD-0120-02",
+          "serialNumber": "APPLE-IMAC-011",
+          "status": "Working",
+          "notes": "Photo editing station"
+        },
+        {
+          "id": "EQ-020",
+          "type": "Computer",
+          "name": "iMac 27\" (Edit Bay 3)",
+          "assetTag": "CSUN-AD-0120-03",
+          "serialNumber": "APPLE-IMAC-012",
+          "status": "Working",
+          "notes": "Photo editing station"
+        },
+        {
+          "id": "EQ-021",
+          "type": "Display",
+          "name": "Samsung 65\" Display",
+          "assetTag": "CSUN-AD-0120-TV",
+          "serialNumber": "SAM-65-001",
+          "status": "Working",
+          "notes": "Instructor display"
+        },
+        {
+          "id": "EQ-022",
+          "type": "Printer",
+          "name": "Epson SureColor P900",
+          "assetTag": "CSUN-AD-0120-PRN",
+          "serialNumber": "EPSON-SC-001",
+          "status": "Working",
+          "notes": "Photo quality printer"
+        }
+      ],
+      "notes": "Photography and digital imaging lab - Lightroom, Photoshop",
+      "lastUpdated": "2024-01-15"
+    },
+    {
+      "id": "ROOM-006",
+      "roomNumber": "Art 201",
+      "name": "Classroom 201",
+      "building": "Art Building",
+      "floor": "2",
+      "type": "Classroom",
+      "capacity": 30,
+      "primaryContact": "",
+      "equipment": [
+        {
+          "id": "EQ-023",
+          "type": "Computer",
+          "name": "Dell OptiPlex 5090",
+          "assetTag": "CSUN-AD-0201",
+          "serialNumber": "DELL-5090-001",
+          "status": "Working",
+          "notes": "Instructor podium"
+        },
+        {
+          "id": "EQ-024",
+          "type": "Display",
+          "name": "Epson Projector",
+          "assetTag": "CSUN-AD-0201-PROJ",
+          "serialNumber": "EPSON-003",
+          "status": "Working",
+          "notes": "Ceiling mounted"
+        }
+      ],
+      "notes": "Standard classroom",
+      "lastUpdated": "2024-01-15"
+    }
+  ],
+  "roomTypes": ["Office", "Lab", "Classroom", "Conference", "Studio", "Storage", "Other"],
+  "equipmentTypes": ["Computer", "Display", "Projector", "Printer", "Audio", "Camera", "Network", "Other"],
+  "equipmentStatuses": ["Working", "In Repair", "Not Working", "Retired"],
+  "buildings": ["Art Building", "Design Building"]
+}

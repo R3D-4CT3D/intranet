@@ -1,0 +1,121 @@
+{
+  "checkouts": [
+    {
+      "id": "CHK-001",
+      "fullName": "Sarah Johnson",
+      "studentId": "12345678",
+      "csunEmail": "sarah.johnson.123@my.csun.edu",
+      "personalEmail": "sarahj@gmail.com",
+      "phoneNumber": "(818) 555-0101",
+      "borrowerType": "Student",
+      "equipment": [
+        {
+          "id": "EQ-001",
+          "type": "Laptop",
+          "name": "MacBook Pro 16\" M3",
+          "assetTag": "CSUN-AD-0050",
+          "returnedDate": null
+        },
+        {
+          "id": "EQ-002",
+          "type": "Display Tablet",
+          "name": "Wacom Cintiq 22",
+          "assetTag": "CSUN-AD-0055",
+          "returnedDate": null
+        }
+      ],
+      "checkoutDate": "2025-12-15",
+      "dueDate": "2026-01-10",
+      "checkedInDate": null,
+      "purpose": "Spring 2026 Animation Course",
+      "status": "Active",
+      "notes": "Semester loan for senior project - OVERDUE",
+      "checkedOutBy": "Brandon"
+    },
+    {
+      "id": "CHK-002",
+      "fullName": "Michael Chen",
+      "studentId": "87654321",
+      "csunEmail": "michael.chen.456@my.csun.edu",
+      "personalEmail": "mchen@yahoo.com",
+      "phoneNumber": "(818) 555-0202",
+      "borrowerType": "Student",
+      "equipment": [
+        {
+          "id": "EQ-003",
+          "type": "Non-Display Tablet",
+          "name": "Wacom Intuos Pro Large",
+          "assetTag": "CSUN-AD-0060",
+          "returnedDate": "2026-01-15"
+        }
+      ],
+      "checkoutDate": "2026-01-05",
+      "dueDate": "2026-01-20",
+      "checkedInDate": "2026-01-15",
+      "purpose": "Digital illustration project",
+      "status": "Returned",
+      "notes": "Returned in good condition",
+      "checkedOutBy": "Jake"
+    },
+    {
+      "id": "CHK-003",
+      "fullName": "Prof. Emily Davis",
+      "studentId": "",
+      "csunEmail": "emily.davis@csun.edu",
+      "personalEmail": "",
+      "phoneNumber": "(818) 555-0303",
+      "borrowerType": "Faculty",
+      "equipment": [
+        {
+          "id": "EQ-004",
+          "type": "Laptop",
+          "name": "Dell XPS 15",
+          "assetTag": "CSUN-AD-0070",
+          "returnedDate": null
+        }
+      ],
+      "checkoutDate": "2025-12-01",
+      "dueDate": "2026-01-05",
+      "checkedInDate": null,
+      "purpose": "Teaching - Spring semester",
+      "status": "Active",
+      "notes": "Long-term faculty loan - OVERDUE",
+      "checkedOutBy": "Brandon"
+    },
+    {
+      "id": "CHK-004",
+      "fullName": "Alex Rivera",
+      "studentId": "11223344",
+      "csunEmail": "alex.rivera@my.csun.edu",
+      "personalEmail": "arivera@gmail.com",
+      "phoneNumber": "(818) 555-0404",
+      "borrowerType": "Student",
+      "equipment": [
+        {
+          "id": "EQ-005",
+          "type": "Camera",
+          "name": "Canon EOS R5",
+          "assetTag": "CSUN-AD-0080",
+          "returnedDate": null
+        },
+        {
+          "id": "EQ-006",
+          "type": "Other",
+          "name": "Tripod - Manfrotto",
+          "assetTag": "CSUN-AD-0081",
+          "returnedDate": null
+        }
+      ],
+      "checkoutDate": "2026-01-15",
+      "dueDate": "2026-01-25",
+      "checkedInDate": null,
+      "purpose": "Documentary project",
+      "status": "Active",
+      "notes": "Due next week",
+      "checkedOutBy": "Jake"
+    }
+  ],
+  "borrowerTypes": ["Student", "Faculty", "Staff", "Guest"],
+  "checkoutStatuses": ["Active", "Returned", "Overdue", "Lost"],
+  "equipmentTypes": ["Laptop", "Display Tablet", "Non-Display Tablet", "Monitor", "Camera", "Other"]
+}

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Inventory - CSUN Art & Design</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .csun-red { background-color: #CE1126; }
+        .csun-red-text { color: #CE1126; }
+        .csun-red-border { border-color: #CE1126; }
+        .csun-red-hover:hover { background-color: #a00e1f; }
+        .modal { display: none; }
+        .modal.active { display: flex; }
+
+        .room-card {
+            transition: all 0.3s ease;
+        }
+        .room-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .status-all-good { border-left: 4px solid #22c55e; }
+        .status-has-issues { border-left: 4px solid #eab308; }
+        .status-problems { border-left: 4px solid #ef4444; }
+
+        .equipment-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .type-lab { background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); }
+        .type-office { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); }
+        .type-classroom { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .type-conference { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+        .type-studio { background: linear-gradient(135deg, #ec4899 0%, #be185d 100%); }
+        .type-other { background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%); }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Header -->
+    <header class="csun-red text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <a href="index.html" class="hover:bg-white/20 p-2 rounded-lg transition">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                    <div>
+                        <h1 class="text-2xl font-bold">Room Inventory</h1>
+                        <p class="text-sm opacity-90">View equipment by location</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="exportRooms()" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg text-sm transition">
+                        <i class="fas fa-download mr-2"></i>Export CSV
+                    </button>
+                    <button onclick="openAddRoomModal()" class="bg-white hover:bg-gray-100 text-gray-800 px-4 py-2 rounded-lg text-sm font-medium transition">
+                        <i class="fas fa-plus mr-2"></i>Add Room
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Stats & Filters -->
+    <div class="max-w-7xl mx-auto px-6 py-4">
+        <div class="bg-white rounded-xl shadow-lg p-4">
+            <div class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
+                <!-- Quick Stats -->
+                <div class="md:col-span-2 flex gap-4">
+                    <div class="text-center">
+                        <div class="text-3xl font-bold csun-red-text" id="statRooms">0</div>
+                        <div class="text-xs text-gray-500">Rooms</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-green-600" id="statWorking">0</div>
+                        <div class="text-xs text-gray-500">Working</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-yellow-600" id="statIssues">0</div>
+                        <div class="text-xs text-gray-500">Issues</div>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Search</label>
+                    <input type="text" id="searchInput" placeholder="Room, equipment..."
+                           class="w-full border rounded-lg px-3 py-2 text-sm" oninput="filterRooms()">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Type</label>
+                    <select id="filterType" class="w-full border rounded-lg px-3 py-2 text-sm" onchange="filterRooms()">
+                        <option value="">All Types</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Floor</label>
+                    <select id="filterFloor" class="w-full border rounded-lg px-3 py-2 text-sm" onchange="filterRooms()">
+                        <option value="">All Floors</option>
+                    </select>
+                </div>
+                <div>
+                    <button onclick="clearFilters()" class="w-full bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg text-sm">
+                        <i class="fas fa-times mr-2"></i>Clear
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Toggle -->
+    <div class="max-w-7xl mx-auto px-6 pb-2">
+        <div class="flex gap-2">
+            <button onclick="setView('grid')" id="viewGrid" class="px-4 py-2 rounded-lg text-sm font-medium bg-gray-800 text-white">
+                <i class="fas fa-th-large mr-2"></i>Grid
+            </button>
+            <button onclick="setView('list')" id="viewList" class="px-4 py-2 rounded-lg text-sm font-medium bg-white text-gray-600 hover:bg-gray-100">
+                <i class="fas fa-list mr-2"></i>List
+            </button>
+        </div>
+    </div>
+
+    <!-- Room Cards Grid -->
+    <div id="roomsGrid" class="max-w-7xl mx-auto px-6 pb-8">
+        <div id="roomsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="col-span-full text-center py-12 text-gray-400">
+                <i class="fas fa-spinner fa-spin text-2xl"></i>
+                <p class="mt-2">Loading rooms...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Room List View (hidden by default) -->
+    <div id="roomsList" class="max-w-7xl mx-auto px-6 pb-8 hidden">
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <table class="w-full">
+                <thead class="bg-gray-50 border-b">
+                    <tr>
+                        <th class="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Room</th>
+                        <th class="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Type</th>
+                        <th class="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Equipment</th>
+                        <th class="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Status</th>
+                        <th class="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="roomsTableBody" class="divide-y">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Room Detail Modal -->
+    <div id="roomDetailModal" class="modal fixed inset-0 bg-black/50 items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div class="csun-red p-4 flex items-center justify-between sticky top-0 z-10">
+                <div>
+                    <h2 class="text-white font-bold text-xl" id="detailRoomNumber">Room</h2>
+                    <p class="text-white/80 text-sm" id="detailRoomName"></p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="editCurrentRoom()" class="bg-white/20 hover:bg-white/30 text-white px-3 py-2 rounded-lg text-sm">
+                        <i class="fas fa-edit mr-1"></i>Edit
+                    </button>
+                    <button onclick="closeDetailModal()" class="text-white hover:bg-white/20 p-2 rounded-lg transition">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Room Info -->
+            <div class="p-4 bg-gray-50 border-b">
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                    <div>
+                        <span class="text-gray-500">Type:</span>
+                        <span class="font-medium ml-1" id="detailType"></span>
+                    </div>
+                    <div>
+                        <span class="text-gray-500">Building:</span>
+                        <span class="font-medium ml-1" id="detailBuilding"></span>
+                    </div>
+                    <div>
+                        <span class="text-gray-500">Updated:</span>
+                        <span class="font-medium ml-1" id="detailUpdated"></span>
+                    </div>
+                </div>
+                <div class="mt-2 text-sm text-gray-600" id="detailNotes"></div>
+            </div>
+
+            <!-- Equipment List -->
+            <div class="p-4">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-bold text-gray-700">Equipment in this Room</h3>
+                    <button onclick="addEquipmentToRoom()" class="text-sm csun-red-text hover:underline">
+                        <i class="fas fa-plus mr-1"></i>Add Equipment
+                    </button>
+                </div>
+                <div id="detailEquipmentList" class="space-y-2">
+                    <!-- Equipment items populated by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Room Modal -->
+    <div id="roomModal" class="modal fixed inset-0 bg-black/50 items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div class="csun-red p-4 flex items-center justify-between sticky top-0">
+                <h2 class="text-white font-bold text-lg" id="roomModalTitle">Add Room</h2>
+                <button onclick="closeRoomModal()" class="text-white hover:bg-white/20 p-2 rounded-lg transition">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="roomForm" class="p-6 space-y-4">
+                <input type="hidden" id="roomId">
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Room Number *</label>
+                        <input type="text" id="roomNumber" required placeholder="e.g., Art 115"
+                               class="w-full border rounded-lg px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Room Name</label>
+                        <input type="text" id="roomName" placeholder="e.g., Animation Lab"
+                               class="w-full border rounded-lg px-3 py-2">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Building</label>
+                        <select id="roomBuilding" class="w-full border rounded-lg px-3 py-2">
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Floor</label>
+                        <input type="text" id="roomFloor" placeholder="1, 2, B, etc."
+                               class="w-full border rounded-lg px-3 py-2">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Type *</label>
+                    <select id="roomType" required class="w-full border rounded-lg px-3 py-2">
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                    <textarea id="roomNotes" rows="2" class="w-full border rounded-lg px-3 py-2"></textarea>
+                </div>
+
+                <div class="flex gap-3 pt-4 border-t">
+                    <button type="button" onclick="closeRoomModal()" class="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50">
+                        Cancel
+                    </button>
+                    <button type="submit" class="flex-1 csun-red csun-red-hover text-white px-4 py-2 rounded-lg">
+                        <i class="fas fa-save mr-2"></i>Save Room
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Equipment Modal -->
+    <div id="equipmentModal" class="modal fixed inset-0 bg-black/50 items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md">
+            <div class="csun-red p-4 flex items-center justify-between">
+                <h2 class="text-white font-bold text-lg" id="equipmentModalTitle">Add Equipment</h2>
+                <button onclick="closeEquipmentModal()" class="text-white hover:bg-white/20 p-2 rounded-lg transition">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="equipmentForm" class="p-6 space-y-4">
+                <input type="hidden" id="eqId">
+                <input type="hidden" id="eqRoomId">
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Type *</label>
+                    <select id="eqType" required class="w-full border rounded-lg px-3 py-2">
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Name/Model *</label>
+                    <input type="text" id="eqName" required placeholder="e.g., Dell OptiPlex 7090"
+                           class="w-full border rounded-lg px-3 py-2">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Asset Tag</label>
+                        <input type="text" id="eqAssetTag" placeholder="CSUN-AD-XXXX"
+                               class="w-full border rounded-lg px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Serial Number</label>
+                        <input type="text" id="eqSerial" class="w-full border rounded-lg px-3 py-2">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Status *</label>
+                    <select id="eqStatus" required class="w-full border rounded-lg px-3 py-2">
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                    <input type="text" id="eqNotes" placeholder="Location in room, special info..."
+                           class="w-full border rounded-lg px-3 py-2">
+                </div>
+
+                <div class="flex gap-3 pt-4 border-t">
+                    <button type="button" onclick="closeEquipmentModal()" class="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50">
+                        Cancel
+                    </button>
+                    <button type="submit" class="flex-1 csun-red csun-red-hover text-white px-4 py-2 rounded-lg">
+                        <i class="fas fa-save mr-2"></i>Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/dataService.js"></script>
+    <script src="js/rooms.js"></script>
+</body>
+</html>

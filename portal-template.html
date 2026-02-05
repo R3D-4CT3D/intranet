@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">CSUN Art & Design Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .csun-red { background-color: #CE1126; }
+        .csun-red-text { color: #CE1126; }
+        .csun-red-border { border-color: #CE1126; }
+        
+        .action-button {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(206, 17, 38, 0.2);
+            border-color: #CE1126;
+        }
+        
+        .news-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .news-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+        
+        .chat-bubble {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1000;
+        }
+        
+        .chat-window {
+            position: fixed;
+            bottom: 100px;
+            right: 24px;
+            width: 380px;
+            height: 500px;
+            z-index: 999;
+            display: none;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .chat-window.active {
+            display: block;
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #CE1126 0%, #a00e1f 100%);
+        }
+
+        /* Calendar Styles */
+        .calendar-day {
+            transition: all 0.2s ease;
+        }
+        
+        .calendar-day:hover {
+            background-color: #f3f4f6;
+        }
+        
+        .calendar-day.has-event {
+            background-color: #fef3f2;
+            border-left: 3px solid #CE1126;
+        }
+        
+        .calendar-day.has-event:hover {
+            background-color: #fee2e2;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="csun-red text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold" id="headerTitle">CSUN Art & Design Portal</h1>
+                    <p class="text-sm opacity-90 mt-1" id="headerSubtitle">Department Technology Services</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm opacity-90" id="welcomeMessage">Welcome, Faculty & Staff</div>
+                    <div class="text-xs opacity-75 mt-1" id="currentDate"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-6 py-8">
+        <!-- Stats Bar -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="stat-card rounded-lg shadow-lg p-6 text-white text-center">
+                <div class="text-sm opacity-90 uppercase mb-2" id="statLabel1">Total Enrollments</div>
+                <div class="text-4xl font-bold" id="statValue1">1,647</div>
+            </div>
+            <div class="stat-card rounded-lg shadow-lg p-6 text-white text-center">
+                <div class="text-sm opacity-90 uppercase mb-2" id="statLabel2">Undergraduate</div>
+                <div class="text-4xl font-bold" id="statValue2">1,523</div>
+            </div>
+            <div class="stat-card rounded-lg shadow-lg p-6 text-white text-center">
+                <div class="text-sm opacity-90 uppercase mb-2" id="statLabel3">Graduate</div>
+                <div class="text-4xl font-bold" id="statValue3">124</div>
+            </div>
+            <div class="stat-card rounded-lg shadow-lg p-6 text-white text-center">
+                <div class="text-sm opacity-90 uppercase mb-2" id="statLabel4">Faculty</div>
+                <div class="text-4xl font-bold" id="statValue4">140</div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="bg-white rounded-lg shadow-lg mb-8 overflow-hidden">
+            <div class="csun-red p-4">
+                <h2 class="text-white font-bold text-xl" id="sectionQuickActions">Quick Actions</h2>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <button onclick="openPurchaseRequest()" class="action-button bg-white border-2 rounded-lg p-6 text-center shadow hover:shadow-lg">
+                        <i class="fas fa-shopping-cart text-4xl csun-red-text mb-3" id="iconPurchase"></i>
+                        <div class="font-bold text-gray-800" id="btnPurchaseTitle">Purchase Request</div>
+                        <div class="text-xs text-gray-500 mt-1" id="btnPurchaseSubtitle">Hardware & Software</div>
+                    </button>
+
+                    <button onclick="openSupportRequest()" class="action-button bg-white border-2 rounded-lg p-6 text-center shadow hover:shadow-lg">
+                        <i class="fas fa-headset text-4xl csun-red-text mb-3" id="iconSupport"></i>
+                        <div class="font-bold text-gray-800" id="btnSupportTitle">Support Request</div>
+                        <div class="text-xs text-gray-500 mt-1" id="btnSupportSubtitle">Get Technical Help</div>
+                    </button>
+
+                    <button onclick="openRequestStatus()" class="action-button bg-white border-2 rounded-lg p-6 text-center shadow hover:shadow-lg">
+                        <i class="fas fa-clipboard-list text-4xl csun-red-text mb-3" id="iconViewRequests"></i>
+                        <div class="font-bold text-gray-800" id="btnViewRequestsTitle">View Requests</div>
+                        <div class="text-xs text-gray-500 mt-1" id="btnViewRequestsSubtitle">Track Your Tickets</div>
+                    </button>
+
+                    <button onclick="openKnowledgeBase()" class="action-button bg-white border-2 rounded-lg p-6 text-center shadow hover:shadow-lg">
+                        <i class="fas fa-book text-4xl csun-red-text mb-3" id="iconKnowledgeBase"></i>
+                        <div class="font-bold text-gray-800" id="btnKnowledgeBaseTitle">Knowledge Base</div>
+                        <div class="text-xs text-gray-500 mt-1" id="btnKnowledgeBaseSubtitle">FAQs & Guides</div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Two Column Layout: Calendar & News -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Calendar Section -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div class="csun-red p-4 flex items-center justify-between">
+                    <h2 class="text-white font-bold text-xl" id="sectionCalendar">Department Calendar</h2>
+                    <div class="flex gap-2">
+                        <button onclick="previousMonth()" class="text-white hover:bg-red-800 px-3 py-1 rounded">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button onclick="nextMonth()" class="text-white hover:bg-red-800 px-3 py-1 rounded">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="text-center mb-4">
+                        <h3 class="text-2xl font-bold csun-red-text" id="calendarMonth"></h3>
+                    </div>
+                    <div class="grid grid-cols-7 gap-2 mb-2">
+                        <div class="text-center text-xs font-bold text-gray-600">SUN</div>
+                        <div class="text-center text-xs font-bold text-gray-600">MON</div>
+                        <div class="text-center text-xs font-bold text-gray-600">TUE</div>
+                        <div class="text-center text-xs font-bold text-gray-600">WED</div>
+                        <div class="text-center text-xs font-bold text-gray-600">THU</div>
+                        <div class="text-center text-xs font-bold text-gray-600">FRI</div>
+                        <div class="text-center text-xs font-bold text-gray-600">SAT</div>
+                    </div>
+                    <div id="calendarGrid" class="grid grid-cols-7 gap-2">
+                        <!-- Calendar days will be generated by JavaScript -->
+                    </div>
+                    <div class="mt-4 pt-4 border-t">
+                        <h4 class="font-bold text-sm mb-2 csun-red-text" id="sectionUpcomingEvents">Upcoming Events</h4>
+                        <div id="upcomingEvents" class="space-y-2 text-sm">
+                            <!-- Events will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- News & Announcements -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div class="csun-red p-4 flex items-center justify-between">
+                    <h2 class="text-white font-bold text-xl" id="sectionNews">News & Announcements</h2>
+                    <button onclick="openNewsEditor()" class="text-white hover:bg-red-800 px-3 py-1 rounded text-sm">
+                        <i class="fas fa-plus"></i> <span id="btnAddNews">Add News</span>
+                    </button>
+                </div>
+                <div class="p-6 space-y-4 max-h-[600px] overflow-y-auto" id="newsContainer">
+                    <!-- News items will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- IT Staff Contact Section -->
+        <div class="bg-white rounded-lg shadow-lg mt-8 overflow-hidden">
+            <div class="csun-red p-4">
+                <h2 class="text-white font-bold text-xl" id="sectionTeam">IT Support Team</h2>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="staffContainer">
+                    <!-- Staff cards will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Chat Bubble -->
+    <div class="chat-bubble">
+        <button onclick="toggleChat()" class="csun-red text-white rounded-full w-16 h-16 shadow-lg hover:shadow-xl transition-all flex items-center justify-center">
+            <i class="fas fa-comments text-2xl" id="chatIcon"></i>
+        </button>
+    </div>
+
+    <!-- Chat Window -->
+    <div class="chat-window bg-white rounded-lg overflow-hidden" id="chatWindow">
+        <div class="csun-red p-4 flex items-center justify-between">
+            <h3 class="text-white font-bold" id="chatTitle">IT Support Chat</h3>
+            <button onclick="toggleChat()" class="text-white hover:bg-red-800 px-2 py-1 rounded">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="p-4 bg-gray-50 border-b">
+            <label class="block text-sm font-bold mb-2" id="chatContactLabel">Contact:</label>
+            <select id="staffSelect" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500">
+                <!-- Options populated by JavaScript from staffMembers -->
+            </select>
+        </div>
+
+        <div class="flex-1 p-4 h-80 overflow-y-auto bg-gray-50" id="chatMessages">
+            <div class="text-center text-gray-500 text-sm py-8" id="chatSelectPrompt">
+                Select a staff member to start chatting
+            </div>
+        </div>
+
+        <div class="p-4 border-t bg-white">
+            <div class="flex gap-2">
+                <input
+                    type="text"
+                    id="chatInput"
+                    placeholder="Type your message..."
+                    class="flex-1 border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
+                    onkeypress="handleChatEnter(event)"
+                    disabled
+                >
+                <button onclick="sendMessage()" class="csun-red text-white px-4 py-2 rounded-lg hover:bg-red-800 disabled:opacity-50" id="sendButton" disabled>
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ============================================================
+           PORTAL CONFIGURATION
+           ============================================================
+           Edit this section to customize all text, labels, and data.
+           No need to modify code below this section.
+           ============================================================ */
+
+        /* ============================================================
+           SHAREPOINT CONFIGURATION
+           ============================================================
+           UPDATE THESE VALUES for your SharePoint environment.
+           ============================================================ */
+
+        const SHAREPOINT_CONFIG = {
+            // Your SharePoint site URL (update this!)
+            siteUrl: "https://yourcompany.sharepoint.com/sites/ArtDesign",
+
+            // SharePoint List names
+            lists: {
+                news: "PortalNews",           // List for news/announcements
+                stats: "PortalStats"          // List for department statistics
+            },
+
+            // Microsoft 365 Group ID for staff members
+            // To find this: Go to Azure AD > Groups > Find your group > Copy the Object ID
+            // Or in Teams: Team Settings > Get link to team > The GUID in the URL
+            staffGroupId: "YOUR-GROUP-ID-HERE"
+        };
+
+        /* ============================================================
+           PORTAL CONFIGURATION (UI Text & Labels)
+           ============================================================
+           Edit this section to customize text displayed on the page.
+           These are static labels - data comes from SharePoint.
+           ============================================================ */
+
+        const PORTAL_CONFIG = {
+            // ─────────────────────────────────────────────────────────
+            // HEADER & BRANDING
+            // ─────────────────────────────────────────────────────────
+            pageTitle: "CSUN Art & Design Portal",
+            headerTitle: "CSUN Art & Design Portal",
+            headerSubtitle: "Department Technology Services",
+            welcomeMessage: "Welcome, Faculty & Staff",
+
+            // ─────────────────────────────────────────────────────────
+            // SECTION TITLES
+            // ─────────────────────────────────────────────────────────
+            sections: {
+                quickActions: "Quick Actions",
+                calendar: "Department Calendar",
+                news: "News & Announcements",
+                team: "Art & Design Department Staff",
+                upcomingEvents: "Upcoming Events"
+            },
+
+            // ─────────────────────────────────────────────────────────
+            // QUICK ACTION BUTTONS
+            // ─────────────────────────────────────────────────────────
+            quickActions: {
+                purchase: { title: "Purchase Request", subtitle: "Hardware & Software", icon: "fa-shopping-cart" },
+                support: { title: "Support Request", subtitle: "Get Technical Help", icon: "fa-headset" },
+                viewRequests: { title: "View Requests", subtitle: "Track Your Tickets", icon: "fa-clipboard-list" },
+                knowledgeBase: { title: "Knowledge Base", subtitle: "FAQs & Guides", icon: "fa-book" }
+            },
+
+            // ─────────────────────────────────────────────────────────
+            // CHAT WIDGET
+            // ─────────────────────────────────────────────────────────
+            chat: {
+                title: "Department Chat",
+                contactLabel: "Contact:",
+                selectPlaceholder: "Select a staff member...",
+                inputPlaceholder: "Type your message...",
+                selectPrompt: "Select a staff member to start chatting",
+                teamsNote: "Messages are sent via Microsoft Teams",
+                autoReply: "Message received! I'll get back to you shortly."
+            },
+
+            // ─────────────────────────────────────────────────────────
+            // BUTTON LABELS
+            // ─────────────────────────────────────────────────────────
+            buttons: {
+                addNews: "Add News"
+            },
+
+            // ─────────────────────────────────────────────────────────
+            // MESSAGES
+            // ─────────────────────────────────────────────────────────
+            messages: {
+                noUpcomingEvents: "No upcoming events",
+                loadingStaff: "Loading staff directory...",
+                loadingNews: "Loading news...",
+                loadingStats: "Loading...",
+                errorLoadingStaff: "Unable to load staff directory",
+                errorLoadingNews: "Unable to load news",
+                errorLoadingStats: "--",
+                noNews: "No news at this time"
+            },
+
+            // ─────────────────────────────────────────────────────────
+            // NAVIGATION URLS
+            // ─────────────────────────────────────────────────────────
+            urls: {
+                purchaseRequest: "purchase-request.html",
+                supportRequest: "support-request.html",
+                requestStatus: "request-status.html",
+                knowledgeBase: "knowledge-base.html",
+                newsEditor: "news-editor.html"
+            }
+        };
+
+        /* ============================================================
+           DATA STORAGE (populated from SharePoint/Graph API)
+           ============================================================ */
+
+        let staffMembers = [];
+        let newsItems = [];
+        let calendarEvents = [];
+        let statsData = {};
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async function() {
+            applyConfig();
+            updateDate();
+            showLoadingStates();
+
+            // Load all data from SharePoint and Graph API
+            await Promise.all([
+                loadStatsFromSharePoint(),
+                loadNewsFromSharePoint(),
+                loadStaffFromGraph()
+            ]);
+
+            initializeCalendar();
+        });
+
+        // Show loading states while data loads
+        function showLoadingStates() {
+            // Stats loading
+            setText('statValue1', PORTAL_CONFIG.messages.loadingStats);
+            setText('statValue2', PORTAL_CONFIG.messages.loadingStats);
+            setText('statValue3', PORTAL_CONFIG.messages.loadingStats);
+            setText('statValue4', PORTAL_CONFIG.messages.loadingStats);
+
+            // News loading
+            const newsContainer = document.getElementById('newsContainer');
+            newsContainer.textContent = '';
+            const loadingNews = document.createElement('div');
+            loadingNews.className = 'text-center text-gray-500 py-8';
+            loadingNews.textContent = PORTAL_CONFIG.messages.loadingNews;
+            newsContainer.appendChild(loadingNews);
+
+            // Staff loading
+            const staffContainer = document.getElementById('staffContainer');
+            staffContainer.textContent = '';
+            const loadingStaff = document.createElement('div');
+            loadingStaff.className = 'text-center text-gray-500 py-8 col-span-full';
+            loadingStaff.textContent = PORTAL_CONFIG.messages.loadingStaff;
+            staffContainer.appendChild(loadingStaff);
+        }
+
+        /* ============================================================
+           SHAREPOINT REST API FUNCTIONS
+           ============================================================ */
+
+        // Get request digest for SharePoint API calls
+        async function getRequestDigest() {
+            const response = await fetch(`${SHAREPOINT_CONFIG.siteUrl}/_api/contextinfo`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json;odata=verbose'
+                },
+                credentials: 'include'
+            });
+            const data = await response.json();
+            return data.d.GetContextWebInformation.FormDigestValue;
+        }
+
+        // Generic SharePoint list fetch
+        async function getListItems(listName, selectFields, orderBy) {
+            let url = `${SHAREPOINT_CONFIG.siteUrl}/_api/web/lists/getbytitle('${listName}')/items`;
+
+            const params = [];
+            if (selectFields) params.push(`$select=${selectFields}`);
+            if (orderBy) params.push(`$orderby=${orderBy}`);
+            if (params.length > 0) url += '?' + params.join('&');
+
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json;odata=verbose'
+                },
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch list: ${listName}`);
+            }
+
+            const data = await response.json();
+            return data.d.results;
+        }
+
+        // Load Stats from SharePoint
+        async function loadStatsFromSharePoint() {
+            try {
+                const items = await getListItems(
+                    SHAREPOINT_CONFIG.lists.stats,
+                    'Title,StatValue,SortOrder',
+                    'SortOrder'
+                );
+
+                if (items.length > 0) {
+                    // Map stats to display (expecting up to 4 items)
+                    items.slice(0, 4).forEach((item, index) => {
+                        const labelId = `statLabel${index + 1}`;
+                        const valueId = `statValue${index + 1}`;
+                        setText(labelId, item.Title);
+                        setText(valueId, item.StatValue);
+                    });
+
+                    // Store for later use
+                    statsData = items;
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+                // Show error state
+                for (let i = 1; i <= 4; i++) {
+                    setText(`statValue${i}`, PORTAL_CONFIG.messages.errorLoadingStats);
+                }
+            }
+        }
+
+        // Load News from SharePoint
+        async function loadNewsFromSharePoint() {
+            try {
+                const items = await getListItems(
+                    SHAREPOINT_CONFIG.lists.news,
+                    'Title,Link,Created',
+                    'Created desc'
+                );
+
+                // Transform to expected format
+                newsItems = items.map(item => ({
+                    id: item.Id,
+                    title: item.Title,
+                    link: item.Link ? item.Link.Url : '',
+                    date: item.Created
+                }));
+
+                loadNews();
+            } catch (error) {
+                console.error('Error loading news:', error);
+                const container = document.getElementById('newsContainer');
+                container.textContent = '';
+                const errorMsg = document.createElement('div');
+                errorMsg.className = 'text-center text-gray-500 py-8';
+                errorMsg.textContent = PORTAL_CONFIG.messages.errorLoadingNews;
+                container.appendChild(errorMsg);
+            }
+        }
+
+        /* ============================================================
+           MICROSOFT GRAPH API FUNCTIONS
+           ============================================================ */
+
+        // Load staff members from M365 Group via Graph API
+        async function loadStaffFromGraph() {
+            try {
+                // First, try to get an access token
+                // When embedded in SharePoint, we can use the SharePoint token proxy
+                const members = await getGroupMembers(SHAREPOINT_CONFIG.staffGroupId);
+
+                // Transform Graph API response to our format
+                staffMembers = members.map(member => ({
+                    id: member.id,
+                    name: member.displayName,
+                    role: member.jobTitle || 'Staff',
+                    email: member.mail || member.userPrincipalName,
+                    phone: member.businessPhones && member.businessPhones[0] ? member.businessPhones[0] : '',
+                    office: member.officeLocation || ''
+                }));
+
+                loadStaff();
+                loadStaffDropdown();
+            } catch (error) {
+                console.error('Error loading staff from Graph:', error);
+                const container = document.getElementById('staffContainer');
+                container.textContent = '';
+                const errorMsg = document.createElement('div');
+                errorMsg.className = 'text-center text-gray-500 py-8 col-span-full';
+                errorMsg.textContent = PORTAL_CONFIG.messages.errorLoadingStaff;
+                container.appendChild(errorMsg);
+            }
+        }
+
+        // Get group members using Graph API via SharePoint proxy
+        async function getGroupMembers(groupId) {
+            // Method 1: Try using SharePoint's Azure AD Graph proxy
+            // This works when the page is embedded in SharePoint Online
+            const graphUrl = `https://graph.microsoft.com/v1.0/groups/${groupId}/members`;
+
+            try {
+                // Try direct call first (works if proper auth is configured)
+                const response = await fetch(graphUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.value;
+                }
+
+                // If direct call fails, try SharePoint's AAD proxy
+                const proxyUrl = `${SHAREPOINT_CONFIG.siteUrl}/_api/SP.WebProxy.invoke`;
+                const proxyResponse = await fetch(proxyUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json;odata=verbose',
+                        'Content-Type': 'application/json;odata=verbose'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        "requestInfo": {
+                            "Url": graphUrl,
+                            "Method": "GET",
+                            "Headers": {
+                                "results": [{
+                                    "Name": "Accept",
+                                    "Value": "application/json"
+                                }]
+                            }
+                        }
+                    })
+                });
+
+                if (proxyResponse.ok) {
+                    const proxyData = await proxyResponse.json();
+                    const bodyContent = JSON.parse(proxyData.d.Invoke.Body);
+                    return bodyContent.value;
+                }
+
+                throw new Error('Unable to fetch group members');
+            } catch (error) {
+                console.error('Graph API error:', error);
+                throw error;
+            }
+        }
+
+        // Apply all configuration values to the page
+        function applyConfig() {
+            // Page title
+            document.title = PORTAL_CONFIG.pageTitle;
+
+            // Header
+            setText('headerTitle', PORTAL_CONFIG.headerTitle);
+            setText('headerSubtitle', PORTAL_CONFIG.headerSubtitle);
+            setText('welcomeMessage', PORTAL_CONFIG.welcomeMessage);
+
+            // Stats
+            setText('statLabel1', PORTAL_CONFIG.stats.totalEnrollments.label);
+            setText('statValue1', PORTAL_CONFIG.stats.totalEnrollments.value);
+            setText('statLabel2', PORTAL_CONFIG.stats.undergraduate.label);
+            setText('statValue2', PORTAL_CONFIG.stats.undergraduate.value);
+            setText('statLabel3', PORTAL_CONFIG.stats.graduate.label);
+            setText('statValue3', PORTAL_CONFIG.stats.graduate.value);
+            setText('statLabel4', PORTAL_CONFIG.stats.faculty.label);
+            setText('statValue4', PORTAL_CONFIG.stats.faculty.value);
+
+            // Section titles
+            setText('sectionQuickActions', PORTAL_CONFIG.sections.quickActions);
+            setText('sectionCalendar', PORTAL_CONFIG.sections.calendar);
+            setText('sectionNews', PORTAL_CONFIG.sections.news);
+            setText('sectionTeam', PORTAL_CONFIG.sections.team);
+            setText('sectionUpcomingEvents', PORTAL_CONFIG.sections.upcomingEvents);
+
+            // Quick action buttons
+            setText('btnPurchaseTitle', PORTAL_CONFIG.quickActions.purchase.title);
+            setText('btnPurchaseSubtitle', PORTAL_CONFIG.quickActions.purchase.subtitle);
+            setText('btnSupportTitle', PORTAL_CONFIG.quickActions.support.title);
+            setText('btnSupportSubtitle', PORTAL_CONFIG.quickActions.support.subtitle);
+            setText('btnViewRequestsTitle', PORTAL_CONFIG.quickActions.viewRequests.title);
+            setText('btnViewRequestsSubtitle', PORTAL_CONFIG.quickActions.viewRequests.subtitle);
+            setText('btnKnowledgeBaseTitle', PORTAL_CONFIG.quickActions.knowledgeBase.title);
+            setText('btnKnowledgeBaseSubtitle', PORTAL_CONFIG.quickActions.knowledgeBase.subtitle);
+
+            // Update icons if specified
+            setIcon('iconPurchase', PORTAL_CONFIG.quickActions.purchase.icon);
+            setIcon('iconSupport', PORTAL_CONFIG.quickActions.support.icon);
+            setIcon('iconViewRequests', PORTAL_CONFIG.quickActions.viewRequests.icon);
+            setIcon('iconKnowledgeBase', PORTAL_CONFIG.quickActions.knowledgeBase.icon);
+
+            // Buttons
+            setText('btnAddNews', PORTAL_CONFIG.buttons.addNews);
+
+            // Chat widget
+            setText('chatTitle', PORTAL_CONFIG.chat.title);
+            setText('chatContactLabel', PORTAL_CONFIG.chat.contactLabel);
+            setText('chatSelectPrompt', PORTAL_CONFIG.chat.selectPrompt);
+            document.getElementById('chatInput').placeholder = PORTAL_CONFIG.chat.inputPlaceholder;
+        }
+
+        // Helper function to set text content
+        function setText(id, text) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = text;
+        }
+
+        // Helper function to set icon class
+        function setIcon(id, iconClass) {
+            const el = document.getElementById(id);
+            if (el && iconClass) {
+                el.className = `fas ${iconClass} text-4xl csun-red-text mb-3`;
+            }
+        }
+
+        // Populate chat dropdown from staffMembers (using safe DOM methods)
+        function loadStaffDropdown() {
+            const select = document.getElementById('staffSelect');
+            // Clear existing options
+            select.length = 0;
+
+            // Add placeholder option
+            const placeholder = document.createElement('option');
+            placeholder.value = '';
+            placeholder.textContent = PORTAL_CONFIG.chat.selectPlaceholder;
+            select.appendChild(placeholder);
+
+            // Add staff members (only if we have any)
+            if (staffMembers && staffMembers.length > 0) {
+                staffMembers.forEach((staff) => {
+                    const option = document.createElement('option');
+                    // Use email as the value for Teams integration
+                    option.value = staff.email || staff.name.split(' ')[0].toLowerCase();
+                    const displayText = staff.role ? `${staff.name} - ${staff.role}` : staff.name;
+                    option.textContent = displayText;
+                    select.appendChild(option);
+                });
+            }
+        }
+
+        function updateDate() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', options);
+        }
+
+        function loadNews() {
+            const container = document.getElementById('newsContainer');
+            container.textContent = '';
+
+            // Handle empty news
+            if (newsItems.length === 0) {
+                const noNews = document.createElement('div');
+                noNews.className = 'text-center text-gray-500 py-8';
+                noNews.textContent = PORTAL_CONFIG.messages.noNews;
+                container.appendChild(noNews);
+                return;
+            }
+
+            newsItems.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'news-card bg-gray-50 rounded-lg p-4 border-l-4 csun-red-border';
+                if (item.link) {
+                    card.onclick = () => openNews(item.link);
+                    card.style.cursor = 'pointer';
+                }
+
+                const flex = document.createElement('div');
+                flex.className = 'flex items-start justify-between';
+
+                const content = document.createElement('div');
+                content.className = 'flex-1';
+
+                const title = document.createElement('h3');
+                title.className = 'font-bold csun-red-text mb-2';
+                title.textContent = item.title;
+
+                const meta = document.createElement('div');
+                meta.className = 'flex items-center gap-4 text-xs text-gray-500';
+
+                const dateSpan = document.createElement('span');
+                const calIcon = document.createElement('i');
+                calIcon.className = 'far fa-calendar';
+                dateSpan.appendChild(calIcon);
+                dateSpan.appendChild(document.createTextNode(' ' + new Date(item.date).toLocaleDateString()));
+                meta.appendChild(dateSpan);
+
+                if (item.link) {
+                    const linkSpan = document.createElement('span');
+                    const linkIcon = document.createElement('i');
+                    linkIcon.className = 'fas fa-external-link-alt';
+                    linkSpan.appendChild(linkIcon);
+                    linkSpan.appendChild(document.createTextNode(' External Link'));
+                    meta.appendChild(linkSpan);
+                }
+
+                content.appendChild(title);
+                content.appendChild(meta);
+
+                if (item.link) {
+                    const chevron = document.createElement('i');
+                    chevron.className = 'fas fa-chevron-right csun-red-text ml-4';
+                    flex.appendChild(content);
+                    flex.appendChild(chevron);
+                } else {
+                    flex.appendChild(content);
+                }
+
+                card.appendChild(flex);
+                container.appendChild(card);
+            });
+        }
+
+        function loadStaff() {
+            const container = document.getElementById('staffContainer');
+            container.textContent = '';
+
+            // Handle empty staff
+            if (staffMembers.length === 0) {
+                const noStaff = document.createElement('div');
+                noStaff.className = 'text-center text-gray-500 py-8 col-span-full';
+                noStaff.textContent = PORTAL_CONFIG.messages.errorLoadingStaff;
+                container.appendChild(noStaff);
+                return;
+            }
+
+            staffMembers.forEach(staff => {
+                const card = document.createElement('div');
+                card.className = 'bg-gray-50 rounded-lg p-4 border-t-4 csun-red-border';
+
+                // Header section with avatar
+                const header = document.createElement('div');
+                header.className = 'text-center mb-3';
+
+                const avatar = document.createElement('div');
+                avatar.className = 'w-16 h-16 csun-red rounded-full flex items-center justify-center mx-auto mb-2';
+                const initials = document.createElement('span');
+                initials.className = 'text-white text-2xl font-bold';
+                // Get initials from name
+                const nameInitials = staff.name ? staff.name.split(' ').map(n => n[0]).join('').substring(0, 2) : '?';
+                initials.textContent = nameInitials;
+                avatar.appendChild(initials);
+
+                const name = document.createElement('h3');
+                name.className = 'font-bold text-gray-800';
+                name.textContent = staff.name || 'Unknown';
+
+                const role = document.createElement('p');
+                role.className = 'text-xs text-gray-500';
+                role.textContent = staff.role || '';
+
+                header.appendChild(avatar);
+                header.appendChild(name);
+                if (staff.role) {
+                    header.appendChild(role);
+                }
+
+                // Contact info section
+                const contactInfo = document.createElement('div');
+                contactInfo.className = 'space-y-1 text-xs';
+
+                // Email (always show if available)
+                if (staff.email) {
+                    const emailRow = document.createElement('div');
+                    emailRow.className = 'flex items-center gap-2';
+                    const emailIcon = document.createElement('i');
+                    emailIcon.className = 'fas fa-envelope csun-red-text w-4';
+                    const emailLink = document.createElement('a');
+                    emailLink.href = `mailto:${staff.email}`;
+                    emailLink.className = 'text-gray-600 hover:text-red-600 truncate';
+                    emailLink.textContent = staff.email;
+                    emailRow.appendChild(emailIcon);
+                    emailRow.appendChild(emailLink);
+                    contactInfo.appendChild(emailRow);
+                }
+
+                // Phone (only show if available)
+                if (staff.phone) {
+                    const phoneRow = document.createElement('div');
+                    phoneRow.className = 'flex items-center gap-2';
+                    const phoneIcon = document.createElement('i');
+                    phoneIcon.className = 'fas fa-phone csun-red-text w-4';
+                    const phoneText = document.createElement('span');
+                    phoneText.className = 'text-gray-600';
+                    phoneText.textContent = staff.phone;
+                    phoneRow.appendChild(phoneIcon);
+                    phoneRow.appendChild(phoneText);
+                    contactInfo.appendChild(phoneRow);
+                }
+
+                // Office (only show if available)
+                if (staff.office) {
+                    const officeRow = document.createElement('div');
+                    officeRow.className = 'flex items-center gap-2';
+                    const officeIcon = document.createElement('i');
+                    officeIcon.className = 'fas fa-map-marker-alt csun-red-text w-4';
+                    const officeText = document.createElement('span');
+                    officeText.className = 'text-gray-600';
+                    officeText.textContent = staff.office;
+                    officeRow.appendChild(officeIcon);
+                    officeRow.appendChild(officeText);
+                    contactInfo.appendChild(officeRow);
+                }
+
+                card.appendChild(header);
+                card.appendChild(contactInfo);
+                container.appendChild(card);
+            });
+        }
+
+        // Calendar Functions
+        let currentDate = new Date();
+
+        function initializeCalendar() {
+            renderCalendar();
+            loadUpcomingEvents();
+        }
+
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+
+            document.getElementById('calendarMonth').textContent =
+                currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            const grid = document.getElementById('calendarGrid');
+            grid.textContent = '';
+
+            // Empty cells before first day
+            for (let i = 0; i < firstDay; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'p-2';
+                grid.appendChild(emptyCell);
+            }
+
+            // Calendar days
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const hasEvent = calendarEvents.some(e => e.date === dateStr);
+                const isToday = dateStr === new Date().toISOString().split('T')[0];
+
+                const dayCell = document.createElement('div');
+                dayCell.className = `calendar-day p-2 rounded text-center cursor-pointer ${hasEvent ? 'has-event' : ''} ${isToday ? 'bg-red-100 font-bold' : ''}`;
+                dayCell.onclick = () => showDayEvents(dateStr);
+
+                const dayNum = document.createElement('div');
+                dayNum.className = 'text-sm';
+                dayNum.textContent = day;
+                dayCell.appendChild(dayNum);
+
+                if (hasEvent) {
+                    const dot = document.createElement('div');
+                    dot.className = 'w-1 h-1 csun-red rounded-full mx-auto mt-1';
+                    dayCell.appendChild(dot);
+                }
+
+                grid.appendChild(dayCell);
+            }
+        }
+
+        function previousMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        }
+
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        }
+
+        function loadUpcomingEvents() {
+            const container = document.getElementById('upcomingEvents');
+            const upcoming = calendarEvents
+                .filter(e => new Date(e.date) >= new Date())
+                .sort((a, b) => new Date(a.date) - new Date(b.date))
+                .slice(0, 5);
+
+            // Clear container
+            container.textContent = '';
+
+            if (upcoming.length === 0) {
+                const noEvents = document.createElement('div');
+                noEvents.className = 'text-gray-500 text-xs';
+                noEvents.textContent = PORTAL_CONFIG.messages.noUpcomingEvents;
+                container.appendChild(noEvents);
+                return;
+            }
+
+            upcoming.forEach(event => {
+                const eventDiv = document.createElement('div');
+                eventDiv.className = 'flex items-start gap-2 pb-2 border-b';
+
+                const icon = document.createElement('i');
+                icon.className = 'fas fa-calendar-day csun-red-text mt-1';
+
+                const content = document.createElement('div');
+                content.className = 'flex-1';
+
+                const title = document.createElement('div');
+                title.className = 'font-bold text-xs';
+                title.textContent = event.title;
+
+                const dateTime = document.createElement('div');
+                dateTime.className = 'text-xs text-gray-500';
+                dateTime.textContent = `${new Date(event.date).toLocaleDateString()} - ${event.time}`;
+
+                content.appendChild(title);
+                content.appendChild(dateTime);
+                eventDiv.appendChild(icon);
+                eventDiv.appendChild(content);
+                container.appendChild(eventDiv);
+            });
+        }
+
+        function showDayEvents(dateStr) {
+            const events = calendarEvents.filter(e => e.date === dateStr);
+            if (events.length > 0) {
+                alert(`Events on ${new Date(dateStr).toLocaleDateString()}:\n\n${events.map(e => `${e.title} - ${e.time}`).join('\n')}`);
+            }
+        }
+
+        // Chat Functions
+        function toggleChat() {
+            const chatWindow = document.getElementById('chatWindow');
+            const chatIcon = document.getElementById('chatIcon');
+            
+            if (chatWindow.classList.contains('active')) {
+                chatWindow.classList.remove('active');
+                chatIcon.className = 'fas fa-comments text-2xl';
+            } else {
+                chatWindow.classList.add('active');
+                chatIcon.className = 'fas fa-times text-2xl';
+            }
+        }
+
+        document.getElementById('staffSelect').addEventListener('change', function() {
+            const selected = this.value;
+            const chatInput = document.getElementById('chatInput');
+            const sendButton = document.getElementById('sendButton');
+            const messagesDiv = document.getElementById('chatMessages');
+
+            // Clear messages
+            messagesDiv.textContent = '';
+
+            if (selected) {
+                chatInput.disabled = false;
+                sendButton.disabled = false;
+                chatInput.focus();
+
+                // Build chat ready message using DOM methods
+                const wrapper = document.createElement('div');
+                wrapper.className = 'text-center text-gray-500 text-sm py-4';
+
+                const icon = document.createElement('i');
+                icon.className = 'fas fa-comment-dots text-3xl csun-red-text mb-2';
+
+                const chatWith = document.createElement('p');
+                chatWith.textContent = `Chat with ${this.options[this.selectedIndex].text}`;
+
+                const teamsNote = document.createElement('p');
+                teamsNote.className = 'text-xs mt-2';
+                teamsNote.textContent = PORTAL_CONFIG.chat.teamsNote;
+
+                wrapper.appendChild(icon);
+                wrapper.appendChild(document.createElement('br'));
+                wrapper.appendChild(chatWith);
+                wrapper.appendChild(teamsNote);
+                messagesDiv.appendChild(wrapper);
+            } else {
+                chatInput.disabled = true;
+                sendButton.disabled = true;
+
+                const prompt = document.createElement('div');
+                prompt.className = 'text-center text-gray-500 text-sm py-8';
+                prompt.textContent = PORTAL_CONFIG.chat.selectPrompt;
+                messagesDiv.appendChild(prompt);
+            }
+        });
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            const selectedStaff = document.getElementById('staffSelect').value;
+
+            if (!message || !selectedStaff) return;
+
+            const messagesDiv = document.getElementById('chatMessages');
+            const timestamp = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+
+            // Create sent message bubble using DOM methods
+            const sentWrapper = document.createElement('div');
+            sentWrapper.className = 'mb-4 flex justify-end';
+
+            const sentBubble = document.createElement('div');
+            sentBubble.className = 'bg-red-100 rounded-lg px-4 py-2 max-w-xs';
+
+            const sentText = document.createElement('p');
+            sentText.className = 'text-sm';
+            sentText.textContent = message;
+
+            const sentTime = document.createElement('p');
+            sentTime.className = 'text-xs text-gray-500 mt-1';
+            sentTime.textContent = timestamp;
+
+            sentBubble.appendChild(sentText);
+            sentBubble.appendChild(sentTime);
+            sentWrapper.appendChild(sentBubble);
+            messagesDiv.appendChild(sentWrapper);
+
+            input.value = '';
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+            // Here you would integrate with Microsoft Teams API
+            console.log(`Sending to ${selectedStaff}: ${message}`);
+
+            // Simulate response
+            setTimeout(() => {
+                const replyWrapper = document.createElement('div');
+                replyWrapper.className = 'mb-4 flex justify-start';
+
+                const replyBubble = document.createElement('div');
+                replyBubble.className = 'bg-gray-200 rounded-lg px-4 py-2 max-w-xs';
+
+                const replyText = document.createElement('p');
+                replyText.className = 'text-sm';
+                replyText.textContent = PORTAL_CONFIG.chat.autoReply;
+
+                const replyTime = document.createElement('p');
+                replyTime.className = 'text-xs text-gray-500 mt-1';
+                replyTime.textContent = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+
+                replyBubble.appendChild(replyText);
+                replyBubble.appendChild(replyTime);
+                replyWrapper.appendChild(replyBubble);
+                messagesDiv.appendChild(replyWrapper);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }, 1000);
+        }
+
+        function handleChatEnter(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // Navigation Functions (using config URLs)
+        function openPurchaseRequest() {
+            window.open(PORTAL_CONFIG.urls.purchaseRequest, '_blank');
+        }
+
+        function openSupportRequest() {
+            window.open(PORTAL_CONFIG.urls.supportRequest, '_blank');
+        }
+
+        function openRequestStatus() {
+            window.open(PORTAL_CONFIG.urls.requestStatus, '_blank');
+        }
+
+        function openKnowledgeBase() {
+            window.open(PORTAL_CONFIG.urls.knowledgeBase, '_blank');
+        }
+
+        function openNews(link) {
+            if (link && link !== '#') {
+                window.open(link, '_blank');
+            }
+        }
+
+        function openNewsEditor() {
+            window.open(PORTAL_CONFIG.urls.newsEditor, '_blank');
+        }
+    </script>
+</body>
+</html>

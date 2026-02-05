@@ -37,3 +37,15 @@ config/deploy.json
 .env
 .env.local
 .env.*.local
+
+# Keys / certs
+*.pem
+*.key
+*.pfx
+*.crt
+
+coverage/
+.cache/
+
+# Local AI / tool configs
+.claude/

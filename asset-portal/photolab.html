@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Lab - CSUN Art & Design</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .csun-red { background-color: #CE1126; }
+        .csun-red-text { color: #CE1126; }
+        .csun-red-border { border-color: #CE1126; }
+        .csun-red-hover:hover { background-color: #a00e1f; }
+        .modal { display: none; }
+        .modal.active { display: flex; }
+        .tab-btn.active { background-color: #CE1126; color: white; }
+
+        /* Station styles */
+        .station {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .station:hover { transform: scale(1.1); }
+        .station.available { background-color: #dcfce7; color: #166534; border: 2px solid #86efac; }
+        .station.in-use { background-color: #fee2e2; color: #991b1b; border: 2px solid #fca5a5; }
+        .station.maintenance { background-color: #fef3c7; color: #92400e; border: 2px solid #fcd34d; }
+
+        /* Schedule class indicator */
+        .class-active {
+            animation: pulse-border 2s infinite;
+        }
+        @keyframes pulse-border {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(206, 17, 38, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(206, 17, 38, 0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Header -->
+    <header class="csun-red text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <a href="index.html" class="hover:bg-white/20 p-2 rounded-lg transition">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                    <div>
+                        <h1 class="text-2xl font-bold">Photo Lab</h1>
+                        <p class="text-sm opacity-90">Dark Rooms, Equipment & Students</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="exportPhotoLab()" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg text-sm transition">
+                        <i class="fas fa-download mr-2"></i>Export
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Stats Row -->
+    <div class="max-w-7xl mx-auto px-6 py-4">
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div class="bg-white rounded-lg shadow p-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                        <i class="fas fa-door-open text-green-600"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold" id="statAvailable">0</div>
+                        <div class="text-xs text-gray-500">Available</div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+                        <i class="fas fa-user text-red-600"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold" id="statInUse">0</div>
+                        <div class="text-xs text-gray-500">In Use</div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center">
+                        <i class="fas fa-wrench text-yellow-600"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold" id="statMaintenance">0</div>
+                        <div class="text-xs text-gray-500">Maintenance</div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+                        <i class="fas fa-users text-purple-600"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold" id="statStudents">0</div>
+                        <div class="text-xs text-gray-500">Students</div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                        <i class="fas fa-camera text-blue-600"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold" id="statEquipment">0</div>
+                        <div class="text-xs text-gray-500">Equipment</div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                        <i class="fas fa-chalkboard-teacher text-indigo-600"></i>
+                    </div>
+                    <div>
+                        <div class="text-sm font-semibold" id="statCurrentClass">No Class</div>
+                        <div class="text-xs text-gray-500">Current Class</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="flex gap-2 overflow-x-auto">
+            <button onclick="switchTab('stations')" id="tabStations" class="tab-btn active px-4 py-2 rounded-lg font-medium transition whitespace-nowrap">
+                <i class="fas fa-th mr-2"></i>Stations
+            </button>
+            <button onclick="switchTab('equipment')" id="tabEquipment" class="tab-btn bg-white px-4 py-2 rounded-lg font-medium transition whitespace-nowrap">
+                <i class="fas fa-camera mr-2"></i>Equipment
+            </button>
+            <button onclick="switchTab('students')" id="tabStudents" class="tab-btn bg-white px-4 py-2 rounded-lg font-medium transition whitespace-nowrap">
+                <i class="fas fa-user-graduate mr-2"></i>Students
+            </button>
+            <button onclick="switchTab('schedule')" id="tabSchedule" class="tab-btn bg-white px-4 py-2 rounded-lg font-medium transition whitespace-nowrap">
+                <i class="fas fa-calendar mr-2"></i>Schedule
+            </button>
+        </div>
+    </div>
+
+    <!-- Stations Tab -->
+    <div id="stationsTab" class="max-w-7xl mx-auto px-6 py-4">
+        <!-- Legend -->
+        <div class="bg-white rounded-lg shadow p-4 mb-4 flex flex-wrap gap-4 items-center">
+            <span class="text-sm font-medium text-gray-600">Legend:</span>
+            <div class="flex items-center gap-2">
+                <div class="w-4 h-4 rounded bg-green-200 border-2 border-green-400"></div>
+                <span class="text-sm">Available</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="w-4 h-4 rounded bg-red-200 border-2 border-red-400"></div>
+                <span class="text-sm">In Use</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="w-4 h-4 rounded bg-yellow-200 border-2 border-yellow-400"></div>
+                <span class="text-sm">Maintenance</span>
+            </div>
+        </div>
+
+        <!-- Lab Sections -->
+        <div id="labSections" class="space-y-6">
+            <div class="text-center py-12 text-gray-400">
+                <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                <p>Loading stations...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Equipment Tab -->
+    <div id="equipmentTab" class="max-w-7xl mx-auto px-6 py-4 hidden">
+        <div class="flex justify-between items-center mb-4">
+            <input type="text" id="equipmentSearch" placeholder="Search equipment..."
+                   class="border rounded-lg px-4 py-2 w-64" oninput="filterEquipment()">
+            <button onclick="openEquipmentModal()" class="csun-red csun-red-hover text-white px-4 py-2 rounded-lg text-sm font-medium">
+                <i class="fas fa-plus mr-2"></i>Add Equipment
+            </button>
+        </div>
+        <div id="equipmentGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="col-span-full text-center py-12 text-gray-400">
+                <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                <p>Loading equipment...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Students Tab -->
+    <div id="studentsTab" class="max-w-7xl mx-auto px-6 py-4 hidden">
+        <div class="flex justify-between items-center mb-4">
+            <div class="flex gap-4">
+                <input type="text" id="studentSearch" placeholder="Search students..."
+                       class="border rounded-lg px-4 py-2 w-64" oninput="filterStudents()">
+                <select id="studentCourse" class="border rounded-lg px-4 py-2" onchange="filterStudents()">
+                    <option value="">All Courses</option>
+                </select>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="openImportStudentsModal()" class="bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg text-sm">
+                    <i class="fas fa-file-import mr-2"></i>Import
+                </button>
+                <button onclick="openStudentModal()" class="csun-red csun-red-hover text-white px-4 py-2 rounded-lg text-sm font-medium">
+                    <i class="fas fa-user-plus mr-2"></i>Add Student
+                </button>
+            </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <table class="w-full">
+                <thead class="bg-gray-50 border-b">
+                    <tr>
+                        <th class="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Name</th>
+                        <th class="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Student ID</th>
+                        <th class="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Email</th>
+                        <th class="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Courses</th>
+                        <th class="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Lab Access</th>
+                        <th class="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="studentsTableBody" class="divide-y">
+                    <tr>
+                        <td colspan="6" class="text-center py-12 text-gray-400">
+                            <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                            <p>Loading students...</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Schedule Tab -->
+    <div id="scheduleTab" class="max-w-7xl mx-auto px-6 py-4 hidden">
+        <div class="flex justify-between items-center mb-4">
+            <div class="flex items-center gap-4">
+                <span class="text-sm text-gray-600">Semester:</span>
+                <span id="currentSemester" class="font-semibold">Spring 2024</span>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="openImportScheduleModal()" class="bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg text-sm">
+                    <i class="fas fa-file-import mr-2"></i>Import Schedule
+                </button>
+                <button onclick="openScheduleModal()" class="csun-red csun-red-hover text-white px-4 py-2 rounded-lg text-sm font-medium">
+                    <i class="fas fa-plus mr-2"></i>Add Class
+                </button>
+            </div>
+        </div>
+        <div id="scheduleGrid" class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <table class="w-full">
+                <thead class="bg-gray-50 border-b">
+                    <tr>
+                        <th class="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Course</th>
+                        <th class="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Instructor</th>
+                        <th class="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Days</th>
+                        <th class="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Time</th>
+                        <th class="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Lab</th>
+                        <th class="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="scheduleTableBody" class="divide-y">
+                    <tr>
+                        <td colspan="6" class="text-center py-12 text-gray-400">
+                            <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                            <p>Loading schedule...</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Station Modal (Quick Actions) -->
+    <div id="stationModal" class="modal fixed inset-0 bg-black/50 items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md">
+            <div class="csun-red p-4 flex items-center justify-between">
+                <h2 class="text-white font-bold text-lg" id="stationModalTitle">Station Details</h2>
+                <button onclick="closeStationModal()" class="text-white hover:bg-white/20 p-2 rounded-lg transition">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="stationModalContent" class="p-6">
+                <!-- Content populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Station Checkout Modal -->
+    <div id="checkoutModal" class="modal fixed inset-0 bg-black/50 items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div class="csun-red p-4 flex items-center justify-between sticky top-0">
+                <h2 class="text-white font-bold text-lg" id="checkoutModalTitle">Check Out Station</h2>
+                <button onclick="closeCheckoutModal()" class="text-white hover:bg-white/20 p-2 rounded-lg transition">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="stationCheckoutForm" class="p-6 space-y-4">
+                <!-- Student Warning Banner (hidden by default) -->
+                <div id="studentWarning" class="hidden bg-yellow-50 border-2 border-yellow-400 rounded-lg p-4">
+                    <div class="flex items-start gap-3">
+                        <i class="fas fa-exclamation-triangle text-yellow-600 text-xl mt-0.5"></i>
+                        <div>
+                            <div class="font-semibold text-yellow-800">Student Not Registered</div>
+                            <div class="text-sm text-yellow-700 mt-1">This student is not in the system. They must:</div>
+                            <ul class="text-sm text-yellow-700 mt-2 list-disc list-inside">
+                                <li>Complete the <strong>Safety Form</strong></li>
+                                <li>Confirm which <strong>class</strong> they are enrolled in</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Student Info -->
+                <div class="space-y-3">
+                    <h3 class="font-semibold text-gray-800 border-b pb-2">Student Information</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="col-span-2 relative">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Student Name or ID *</label>
+                            <input type="text" id="coStudentSearch" required
+                                   class="w-full border rounded-lg px-3 py-2"
+                                   placeholder="Start typing to search..."
+                                   oninput="searchStudent(this.value)"
+                                   autocomplete="off">
+                            <div id="studentSearchResults" class="hidden absolute left-0 right-0 bg-white border rounded-lg shadow-lg mt-1 max-h-40 overflow-y-auto z-50"></div>
+                        </div>
+                        <div class="col-span-2 relative">
+                            <div id="selectedStudentInfo" class="hidden bg-green-50 border border-green-200 rounded-lg p-3">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="font-medium text-green-800" id="selectedStudentName"></div>
+                                        <div class="text-sm text-green-600" id="selectedStudentDetails"></div>
+                                    </div>
+                                    <button type="button" onclick="clearSelectedStudent()" class="text-green-600 hover:text-green-800">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Equipment Selection -->
+                <div class="space-y-3">
+                    <h3 class="font-semibold text-gray-800 border-b pb-2">Equipment to Check Out</h3>
+                    <div id="equipmentCheckboxes" class="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto">
+                        <!-- Populated by JS -->
+                    </div>
+                    <p class="text-xs text-gray-500">Select any equipment the student is borrowing with this station</p>
+                </div>
+
+                <!-- Notes -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Notes (optional)</label>
+                    <textarea id="coNotes" rows="2" class="w-full border rounded-lg px-3 py-2"
+                              placeholder="Any additional notes..."></textarea>
+                </div>
+
+                <input type="hidden" id="coStationId">
+                <input type="hidden" id="coStudentId">
+
+                <div class="flex gap-3 pt-4 border-t">
+                    <button type="button" onclick="closeCheckoutModal()" class="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="flex-1 csun-red csun-red-hover text-white px-4 py-2 rounded-lg">
+                        <i class="fas fa-check mr-2"></i>Check Out Station
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Student Modal -->
+    <div id="studentModal" class="modal fixed inset-0 bg-black/50 items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div class="csun-red p-4 flex items-center justify-between sticky top-0">
+                <h2 class="text-white font-bold text-lg">Add Student</h2>
+                <button onclick="closeStudentModal()" class="text-white hover:bg-white/20 p-2 rounded-lg transition">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="studentForm" class="p-6 space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
+                        <input type="text" id="stuName" required class="w-full border rounded-lg px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Student ID *</label>
+                        <input type="text" id="stuStudentId" required class="w-full border rounded-lg px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                        <input type="tel" id="stuPhone" class="w-full border rounded-lg px-3 py-2">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                        <input type="email" id="stuEmail" required class="w-full border rounded-lg px-3 py-2">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Courses</label>
+                        <input type="text" id="stuCourses" placeholder="ART 150, ART 250" class="w-full border rounded-lg px-3 py-2">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Lab Access</label>
+                        <div class="flex flex-wrap gap-2" id="stuLabAccess">
+                            <!-- Checkboxes populated by JS -->
+                        </div>
+                    </div>
+                    <div>
+                        <label class="flex items-center gap-2">
+                            <input type="checkbox" id="stuTraining" class="rounded">
+                            <span class="text-sm">Training Complete</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="flex gap-3 pt-4 border-t">
+                    <button type="button" onclick="closeStudentModal()" class="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="flex-1 csun-red csun-red-hover text-white px-4 py-2 rounded-lg">
+                        <i class="fas fa-save mr-2"></i>Save Student
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Equipment Modal -->
+    <div id="equipmentModal" class="modal fixed inset-0 bg-black/50 items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div class="csun-red p-4 flex items-center justify-between sticky top-0">
+                <h2 class="text-white font-bold text-lg">Add Equipment</h2>
+                <button onclick="closeEquipmentModal()" class="text-white hover:bg-white/20 p-2 rounded-lg transition">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="equipmentForm" class="p-6 space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                        <input type="text" id="eqName" required class="w-full border rounded-lg px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Category *</label>
+                        <select id="eqCategory" required class="w-full border rounded-lg px-3 py-2">
+                            <option value="Camera">Camera</option>
+                            <option value="Lens">Lens</option>
+                            <option value="Lighting">Lighting</option>
+                            <option value="Support">Support</option>
+                            <option value="Accessories">Accessories</option>
+                            <option value="Film">Film</option>
+                            <option value="Chemicals">Chemicals</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                        <input type="text" id="eqType" placeholder="DSLR, Tripod, etc." class="w-full border rounded-lg px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Total Quantity *</label>
+                        <input type="number" id="eqQuantity" min="1" value="1" required class="w-full border rounded-lg px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Available *</label>
+                        <input type="number" id="eqAvailable" min="0" value="1" required class="w-full border rounded-lg px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                        <input type="text" id="eqLocation" class="w-full border rounded-lg px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Condition</label>
+                        <select id="eqCondition" class="w-full border rounded-lg px-3 py-2">
+                            <option value="Excellent">Excellent</option>
+                            <option value="Good">Good</option>
+                            <option value="Fair">Fair</option>
+                            <option value="Poor">Poor</option>
+                        </select>
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                        <textarea id="eqNotes" rows="2" class="w-full border rounded-lg px-3 py-2"></textarea>
+                    </div>
+                </div>
+                <div class="flex gap-3 pt-4 border-t">
+                    <button type="button" onclick="closeEquipmentModal()" class="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="flex-1 csun-red csun-red-hover text-white px-4 py-2 rounded-lg">
+                        <i class="fas fa-save mr-2"></i>Save Equipment
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Import Schedule Modal -->
+    <div id="importScheduleModal" class="modal fixed inset-0 bg-black/50 items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg">
+            <div class="csun-red p-4 flex items-center justify-between">
+                <h2 class="text-white font-bold text-lg">Import Schedule</h2>
+                <button onclick="closeImportScheduleModal()" class="text-white hover:bg-white/20 p-2 rounded-lg transition">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <p class="text-gray-600 mb-4">Upload a CSV file with the following columns:</p>
+                <div class="bg-gray-50 rounded-lg p-3 text-sm font-mono mb-4">
+                    Course Code, Course Name, Instructor, Days, Start Time, End Time, Lab
+                </div>
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                    <input type="file" id="scheduleFile" accept=".csv" class="hidden" onchange="handleScheduleImport(event)">
+                    <label for="scheduleFile" class="cursor-pointer">
+                        <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-2"></i>
+                        <p class="text-gray-600">Click to select CSV file</p>
+                    </label>
+                </div>
+                <div class="flex gap-3 pt-4 mt-4 border-t">
+                    <button onclick="closeImportScheduleModal()" class="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/dataService.js"></script>
+    <script src="js/photolab.js"></script>
+</body>
+</html>

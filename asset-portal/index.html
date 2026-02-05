@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSUN Art & Design - Asset Management Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .csun-red { background-color: #CE1126; }
+        .csun-red-text { color: #CE1126; }
+        .csun-red-border { border-color: #CE1126; }
+        .csun-red-hover:hover { background-color: #a00e1f; }
+
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(206, 17, 38, 0.15);
+        }
+
+        .stat-gradient {
+            background: linear-gradient(135deg, #CE1126 0%, #8b0d1a 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Header -->
+    <header class="csun-red text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold">CSUN Art & Design</h1>
+                    <p class="text-sm opacity-90">IT Asset Management Portal</p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button onclick="exportAllData()" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg text-sm transition">
+                        <i class="fas fa-download mr-2"></i>Export All
+                    </button>
+                    <button onclick="resetPortalData()" class="bg-white/20 hover:bg-white/30 px-3 py-2 rounded-lg text-sm transition" title="Reset to default data">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                    <div class="text-right">
+                        <div class="text-sm opacity-90" id="currentDate"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-6 py-8">
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="stat-gradient rounded-xl shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-sm opacity-80 uppercase">Total Assets</div>
+                        <div class="text-3xl font-bold mt-1" id="statTotalAssets">--</div>
+                    </div>
+                    <i class="fas fa-boxes text-4xl opacity-50"></i>
+                </div>
+            </div>
+            <div class="stat-gradient rounded-xl shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-sm opacity-80 uppercase">Checked Out</div>
+                        <div class="text-3xl font-bold mt-1" id="statCheckedOut">--</div>
+                        <div class="text-xs opacity-60" id="statCheckedOutDetail">out of available</div>
+                    </div>
+                    <i class="fas fa-hand-holding text-4xl opacity-50"></i>
+                </div>
+            </div>
+            <div class="stat-gradient rounded-xl shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-sm opacity-80 uppercase">Overdue</div>
+                        <div class="text-3xl font-bold mt-1" id="statOverdue">--</div>
+                    </div>
+                    <i class="fas fa-exclamation-triangle text-4xl opacity-50"></i>
+                </div>
+            </div>
+            <div class="stat-gradient rounded-xl shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-sm opacity-80 uppercase">Software</div>
+                        <div class="text-3xl font-bold mt-1" id="statSoftware">--</div>
+                    </div>
+                    <i class="fas fa-cube text-4xl opacity-50"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Navigation Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
+            <!-- IT Assets -->
+            <a href="assets.html" class="card-hover bg-white rounded-xl shadow-lg overflow-hidden block">
+                <div class="csun-red p-4">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-laptop text-white text-2xl"></i>
+                        <h2 class="text-white font-bold text-xl">IT Assets</h2>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-600 mb-4">Manage computers, monitors, printers, and IT equipment.</p>
+                    <ul class="text-sm text-gray-500 space-y-2">
+                        <li><i class="fas fa-check csun-red-text mr-2"></i>Full inventory</li>
+                        <li><i class="fas fa-check csun-red-text mr-2"></i>Track locations</li>
+                        <li><i class="fas fa-check csun-red-text mr-2"></i>Export to CSV</li>
+                    </ul>
+                    <div class="mt-4 pt-4 border-t flex justify-between items-center">
+                        <span class="text-sm text-gray-400">Inventory</span>
+                        <i class="fas fa-arrow-right csun-red-text"></i>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Equipment Checkout -->
+            <a href="checkouts.html" class="card-hover bg-white rounded-xl shadow-lg overflow-hidden block">
+                <div class="csun-red p-4">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-clipboard-check text-white text-2xl"></i>
+                        <h2 class="text-white font-bold text-xl">Checkouts</h2>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-600 mb-4">Track equipment loans to faculty, staff, and students.</p>
+                    <ul class="text-sm text-gray-500 space-y-2">
+                        <li><i class="fas fa-check csun-red-text mr-2"></i>Check out/return</li>
+                        <li><i class="fas fa-check csun-red-text mr-2"></i>Track overdue</li>
+                        <li><i class="fas fa-check csun-red-text mr-2"></i>Borrower history</li>
+                    </ul>
+                    <div class="mt-4 pt-4 border-t flex justify-between items-center">
+                        <span class="text-sm text-gray-400">Loans</span>
+                        <i class="fas fa-arrow-right csun-red-text"></i>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Room Inventory -->
+            <a href="rooms.html" class="card-hover bg-white rounded-xl shadow-lg overflow-hidden block">
+                <div class="csun-red p-4">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-door-open text-white text-2xl"></i>
+                        <h2 class="text-white font-bold text-xl">Rooms</h2>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-600 mb-4">View and manage equipment by room location.</p>
+                    <ul class="text-sm text-gray-500 space-y-2">
+                        <li><i class="fas fa-check csun-red-text mr-2"></i>Room inventory</li>
+                        <li><i class="fas fa-check csun-red-text mr-2"></i>Equipment status</li>
+                        <li><i class="fas fa-check csun-red-text mr-2"></i>Lab computers</li>
+                    </ul>
+                    <div class="mt-4 pt-4 border-t flex justify-between items-center">
+                        <span class="text-sm text-gray-400">Locations</span>
+                        <i class="fas fa-arrow-right csun-red-text"></i>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Photo Lab -->
+            <a href="photolab.html" class="card-hover bg-white rounded-xl shadow-lg overflow-hidden block">
+                <div class="csun-red p-4">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-camera-retro text-white text-2xl"></i>
+                        <h2 class="text-white font-bold text-xl">Photo Lab</h2>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-600 mb-4">Manage Photo Lab stations and students.</p>
+                    <ul class="text-sm text-gray-500 space-y-2">
+                        <li><i class="fas fa-check csun-red-text mr-2"></i>Station availability</li>
+                        <li><i class="fas fa-check csun-red-text mr-2"></i>Student tracking</li>
+                        <li><i class="fas fa-check csun-red-text mr-2"></i>Class schedules</li>
+                    </ul>
+                    <div class="mt-4 pt-4 border-t flex justify-between items-center">
+                        <span class="text-sm text-gray-400">Photo Lab</span>
+                        <i class="fas fa-arrow-right csun-red-text"></i>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Software Licenses -->
+            <a href="software.html" class="card-hover bg-white rounded-xl shadow-lg overflow-hidden block">
+                <div class="csun-red p-4">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-cube text-white text-2xl"></i>
+                        <h2 class="text-white font-bold text-xl">Software</h2>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-600 mb-4">Track software licenses, costs, and renewals.</p>
+                    <ul class="text-sm text-gray-500 space-y-2">
+                        <li><i class="fas fa-check csun-red-text mr-2"></i>License tracking</li>
+                        <li><i class="fas fa-check csun-red-text mr-2"></i>Renewal alerts</li>
+                        <li><i class="fas fa-check csun-red-text mr-2"></i>Cost management</li>
+                    </ul>
+                    <div class="mt-4 pt-4 border-t flex justify-between items-center">
+                        <span class="text-sm text-gray-400">Licenses</span>
+                        <i class="fas fa-arrow-right csun-red-text"></i>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Department Directory -->
+            <a href="directory.html" class="card-hover bg-white rounded-xl shadow-lg overflow-hidden block">
+                <div class="csun-red p-4">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-users text-white text-2xl"></i>
+                        <h2 class="text-white font-bold text-xl">Directory</h2>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-600 mb-4">Faculty and staff directory for the department.</p>
+                    <ul class="text-sm text-gray-500 space-y-2">
+                        <li><i class="fas fa-check csun-red-text mr-2"></i>Faculty listings</li>
+                        <li><i class="fas fa-check csun-red-text mr-2"></i>Staff contacts</li>
+                        <li><i class="fas fa-check csun-red-text mr-2"></i>Autofill support</li>
+                    </ul>
+                    <div class="mt-4 pt-4 border-t flex justify-between items-center">
+                        <span class="text-sm text-gray-400">People</span>
+                        <i class="fas fa-arrow-right csun-red-text"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Alerts & Deadlines -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="csun-red p-4 flex items-center justify-between">
+                <h2 class="text-white font-bold"><i class="fas fa-bell mr-2"></i>Alerts & Deadlines</h2>
+                <span class="bg-white/20 text-white text-xs px-2 py-1 rounded" id="alertCount">0</span>
+            </div>
+            <div class="p-4" id="alertsContainer">
+                <div class="text-center text-gray-400 py-8">
+                    <i class="fas fa-spinner fa-spin text-2xl"></i>
+                    <p class="mt-2">Loading...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-12 py-6">
+        <div class="max-w-7xl mx-auto px-6 text-center text-sm">
+            <p>CSUN Art & Design IT Asset Portal</p>
+            <p class="text-gray-400 mt-1">Data stored locally - <a href="#" onclick="showDataInfo()" class="underline hover:text-white">Storage Info</a></p>
+        </div>
+    </footer>
+
+    <script src="js/dataService.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
